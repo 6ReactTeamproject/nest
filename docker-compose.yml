@@ -1,0 +1,61 @@
+  # /nest-test/docker-compose.yml
+  services:
+    # --- 프론트엔드 서비스 정의 (Vite) ---
+    frontend:
+      image: node:20-alpine
+      container_name: frontend
+      ports:
+        # 로컬 5173 포트 -> 컨테이너 5173 포트
+        - "5173:5173"
+      volumes:
+        # 현재 폴더의 ./frontend를 컨테이너의 /app으로 연결
+        - ./frontend:/app
+      working_dir: /app
+      # npm install을 실행하고, --host 플래그로 개발 서버를 실행
+      # --host가 있어야 컨테이너 외부(로컬 PC)에서 접속이 가능합니다.
+      command: sh -c "npm install && npm run dev -- --host"
+
+    # --- 백엔드 서비스 정의 (NestJS) ---
+    backend:
+      image: node:20-alpine
+      container_name: backend
+      ports:
+        # 로컬 3000 포트 -> 컨테이너 3000 포트
+        - "3000:3000"
+      volumes:
+        # 현재 폴더의 ./backend를 컨테이너의 /app으로 연결
+        - ./backend:/app
+      working_dir: /app
+      depends_on:
+        - db
+      # npm install을 실행하고, 개발 모드로 NestJS 실행
+      command: sh -c "npm install && npm run start:dev"
+    
+    # --- DB 서비스 정의 (MySQL) ---
+    db:
+      image: mysql:8.0  
+      container_name: db
+      environment:
+        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        MYSQL_DATABASE: ${MYSQL_DATABASE}
+        MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+        MYSQL_USER: ${MYSQL_USER}
+        MYSQL_CHARSET: utf8mb4
+        MYSQL_COLLATION: utf8mb4_unicode_ci
+      command: [
+        "mysqld",
+        "--character-set-server=utf8mb4",
+        "--collation-server=utf8mb4_unicode_ci",
+      ]
+      ports:
+        # 로컬 3378 포트 -> 컨테이너 3306 포트
+        - "3378:3306"
+      volumes:
+        # MySQL 데이터를 영구적으로 저장하기 위해 db_data 볼륨 사용
+        - ./mysql/init:/docker-entrypoint-initdb.d
+        - db_data:/var/lib/mysql
+
+  # --- 볼륨 정의 ---
+  volumes:
+    # db 서비스가 사용할 db_data 볼륨을 정의
+    db_data: {}

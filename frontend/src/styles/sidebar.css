@@ -1,0 +1,50 @@
+/* 전체 사이드바 */
+.sidebar {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 220px;  /* ✅ 넓이 약간 늘림 */
+  height: calc(100vh - 60px);
+  background-color: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.04);
+  z-index: 999;
+  padding-top: 24px;
+  box-sizing: border-box;
+  overflow-x: hidden; /* ✅ 수평 스크롤 방지 */
+}
+
+/* 사이드바 메뉴 리스트 */
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 16px;
+}
+
+/* 메뉴 항목 */
+.sidebar-item {
+  font-size: 16px;
+  font-weight: 500;
+  padding: 14px 12px;
+  border-radius: 8px;
+  color: #333333;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  word-break: keep-all;    /* ✅ 단어 자르지 않음 */
+  white-space: nowrap;     /* ✅ 줄바꿈 방지 */
+  overflow: hidden;        /* ✅ 넘칠 경우 잘림 처리 */
+  text-overflow: ellipsis; /* ✅ 말줄임표 처리 */
+}
+
+/* 선택된 항목 */
+.sidebar-item.active {
+  background-color: #e5f7ee;
+  color: #03c75a;
+  font-weight: 600;
+}
+
+/* hover 효과 */
+.sidebar-item:hover {
+  background-color: #f1f3f5;
+}

@@ -1,0 +1,527 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "loginId": "heejun",
+      "password": "1111",
+      "name": "강희준",
+      "image": "",
+      "giturl": "https://github.com/Kanghuijun"
+    },
+    {
+      "id": 2,
+      "loginId": "seongmin",
+      "password": "2222",
+      "name": "김성민",
+      "image": "",
+      "giturl": "https://github.com/kimmin042"
+    },
+    {
+      "id": 3,
+      "loginId": "hyukbin",
+      "password": "2222",
+      "name": "권혁빈",
+      "image": "",
+      "giturl": "https://github.com/HB-KWon"
+    },
+    {
+      "id": 4,
+      "loginId": "yoochan",
+      "password": "4444",
+      "name": "이유찬",
+      "image": "",
+      "giturl": "https://github.com/kgh6a"
+    }, 
+    {
+      "id": 5,
+      "loginId": "chagnmin",
+      "password": "5555",
+      "name": "이창민",
+      "image": "",
+      "giturl": "https://github.com/mu4404"
+    }
+  ],
+  "semester": [
+    {
+      "id": 1,
+      "authorId": 1,
+      "title": "교토 고쇼 (京都御所)",
+      "description": "일본 천황이 거주하던 궁궐로, 일본 전통 건축양식과 궁중 문화를 직접 체험하며 일본어 속의 고어 및 의례 표현을 학습하기에 적합한 장소입니다.",
+      "imageUrl": "https://images.unsplash.com/photo-1714066598304-7dcf3bd32c24?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    },
+    {
+      "id": 2,
+      "authorId": 2,
+      "title": "에도 도쿄 박물관 (江戸東京博物館)",
+      "description": "에도 시대부터 현대에 이르는 일본의 생활과 도시 발전을 전시한 박물관으로, 일본어 자료 해석과 역사적 용어 학습에 도움이 됩니다.",
+      "imageUrl": "https://media.triple.guide/triple-cms/c_limit,f_auto,h_1024,w_1024/6ee01bda-f840-4589-af23-a0bb4758858d.jpeg"
+    },
+    {
+      "id": 3,
+      "authorId": 3,
+      "title": "와세다 대학 캠퍼스 (早稲田大学)",
+      "description": "일본 내 인문학 연구로 유명한 명문 대학으로, 일본어 관련 강연이나 전시도 종종 개최되어 학문적 자극을 받을 수 있는 교육적 장소입니다.",
+      "imageUrl": "https://images.unsplash.com/photo-1720238189486-2b090d9a9459?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    },
+    {
+      "id": 4,
+      "authorId": 4,
+      "title": "교토 국제만화뮤지엄 (京都国際マンガミュージアム)",
+      "description": "일본어와 일본 대중문화를 동시에 공부할 수 있는 곳으로, 다양한 시대의 만화를 통해 언어의 변화와 문화를 함께 이해할 수 있습니다.",
+      "imageUrl": "https://img.enjoy-osaka-kyoto-kobe.com/wp-content/uploads/2021/07/04112229/Kyoto-International-Manga-Museum06-1024x683.webp"
+    },
+    {
+      "id": 5,
+      "authorId": 5,
+      "title": "오사카 외국어 학원 (大阪外語学院)",
+      "description": "오사카 중심부에 위치한 외국인 대상 일본어 교육 전문 학원으로, 회화 중심 수업으로 다양한 과정이 개설되어 있습니다. 실생활 속 일본어를 익히고, 일본 문화와 지역사회에 자연스럽게 녹아들 수 있도록 돕는 커리큘럼을 제공합니다.",
+      "imageUrl": "https://lh6.googleusercontent.com/proxy/_3QmCl4sfy-aIW5pS_g2miHEG6dfqGqUkgpKVImPwDe9Tpoq5rLUMnuTxQlwsDbFNb1wzvhEIXuK"
+    }
+  ],
+  "posts": [
+    {
+      "title": "바나나 먹으면 나한테 바나나?",
+      "content": "캬캬캬캬컄ㅋ",
+      "userId": 2,
+      "createdAt": "2023-04-15",
+      "views": 104,
+      "id": 11
+    },
+    {
+      "title": "편의점 말고 마트 간식 뭐가 좋을까요?",
+      "content": "돈키호테 말고 이온이나 세이유 같은 데서 사기 좋은 일본 간식 뭐 있을까요?? 추천 좀요!",
+      "userId": 2,
+      "createdAt": "2024-07-06",
+      "views": 11,
+      "id": 8
+    },
+    {
+      "title": "유후인 온천 마을 가보신 분?",
+      "content": "후쿠오카 근처라 들었는데 조용하고 힐링되나요? 혼자 여행이라 걱정도 좀 되네요ㅠㅠ",
+      "userId": 4,
+      "createdAt": "2024-08-29",
+      "views": 14,
+      "id": 7
+    },
+    {
+      "title": "일본 자판기 진짜 미쳤네요;;",
+      "content": "심야에 뜨끈한 옥수수수프 뽑아먹고 감동받았습니다. 자판기만 투어해도 재밌을 듯 ㅋㅋ",
+      "userId": 5,
+      "createdAt": "2024-12-20",
+      "views": 31,
+      "id": 10
+    },
+    {
+      "title": "돈키호테 쇼핑리스트(후쿠오카 기준으로)",
+      "content": "사보리노 마스크팩,\n나라치카 립밤,\n간장 과자 + 우마이봉\n나라치카 립밤,\n간장 과자 + 우마이봉\n\n사보리노 마스크팩은 1분 안에 올인원 스킨케어까지 가능!!\n하면서 우마이봉 하나 먹으면 끝",
+      "userId": 3,
+      "createdAt": "2025-02-28",
+      "views": 13,
+      "id": 6
+    },
+    {
+      "title": "일본 편의점 음식 추천",
+      "content": "편의점 BEST 3!\n1. 세븐일레븐 - 명란 마요 주먹밥\n2. 로손 - 치즈 인 치킨\n3. 패밀리마트 - 푸딩\n -> 이건 꼭 먹어야함 밤마다 먹으면 기분 좋아짐",
+      "userId": 3,
+      "createdAt": "2025-03-03",
+      "views": 24,
+      "id": 5
+    },
+    {
+      "title": "오사카 어디로 가고싶어요?",
+      "content": "저는 유니버셜 스튜디오 재팬에 가고싶습니다.",
+      "userId": 3,
+      "createdAt": "2025-05-10",
+      "views": 8,
+      "id": 3
+    },
+    {
+      "title": "저는 건물 좋아해서",
+      "content": "오사카 성이나 이케다 성에 가보고 싶네요",
+      "userId": 3,
+      "createdAt": "2025-05-18",
+      "views": 8,
+      "id": 4
+    },
+    {
+      "title": "교토에서 기모노 체험 해보신 분?",
+      "content": "여름에도 많이들 입으시나요? 덥진 않을지 고민돼요. 사진은 예쁘게 나올 것 같긴 한데 ㅎㅎ",
+      "userId": 1,
+      "createdAt": "2025-05-25",
+      "views": 49,
+      "id": 9,
+      "image": ""
+    }
+  ],
+  "comments": [
+    {
+      "text": "이게 무슨 드립이야 ㅋㅋㅋㅋㅋ 터졌음",
+      "postId": "11",
+      "userId": 2,
+      "parentId": null,
+      "createdAt": "2025-06-20T16:00:00.000Z",
+      "likes": 0,
+      "likedUserIds": [],
+      "id": 14
+    },
+    {
+      "text": "우마이봉 진짜 일본 갈 때마다 꼭 사요 ㅋㅋ",
+      "postId": "6",
+      "userId": 3,
+      "parentId": null,
+      "createdAt": "2025-06-20T16:00:01.000Z",
+      "likes": 0,
+      "likedUserIds": [],
+      "id": 15
+    },
+    {
+      "text": "이케다 성은 덜 알려졌는데 은근 매력 있죠~",
+      "postId": "4",
+      "userId": 1,
+      "parentId": null,
+      "createdAt": "2025-06-20T16:00:02.000Z",
+      "likes": 0,
+      "likedUserIds": [],
+      "id": 16
+    },
+    {
+      "text": "UFO 야끼소바도 JMT",
+      "postId": "5",
+      "userId": 1,
+      "parentId": null,
+      "createdAt": "2025-06-20T14:30:42.987Z",
+      "likes": 4,
+      "likedUserIds": [
+        1
+      ],
+      "id": 1
+    },
+    {
+        "text": "푸딩 못 참즤~",
+        "postId": "5",
+        "userId": 2,
+        "parentId": null,
+        "createdAt": "2025-06-20T14:32:41.484Z",
+        "likes": 1,
+        "likedUserIds": [],
+        "id": 2
+    },
+    {
+      "text": "다음에 메론빵도 먹어보세요",
+      "postId": "5",
+      "userId": 4,
+      "parentId": null,
+      "createdAt": "2025-06-20T14:33:08.008Z",
+      "likes": 43,
+      "likedUserIds": [
+        1
+      ],
+      "id": 3
+    },
+    {
+      "text": "유후인 진짜 조용하고 좋아요~ 노천탕 강추입니다",
+      "postId": "7",
+      "userId": 1,
+      "parentId": null,
+      "createdAt": "2025-06-20T15:02:12.000Z",
+      "likes": 5,
+      "likedUserIds": [],
+      "id": 4
+    },
+    {
+      "text": "저도 혼자 갔다왔는데 혼자여서 더 힐링됐어요 ㅎㅎ",
+      "postId": "7",
+      "userId": 5,
+      "parentId": null,
+      "createdAt": "2025-06-20T15:04:18.000Z",
+      "likes": 2,
+      "likedUserIds": [],
+      "id": 5
+    },
+    {
+      "text": "마트 간식은 감자칩 ‘쟈가리코’ 추천이요! 맥주랑 찰떡!",
+      "postId": "8",
+      "userId": 3,
+      "parentId": null,
+      "createdAt": "2025-06-20T15:05:44.000Z",
+      "likes": 7,
+      "likedUserIds": [],
+      "id": 6
+    },
+    {
+      "text": "이온에서 파는 쿄로짱 초코볼도 은근 맛있어요",
+      "postId": "8",
+      "userId": 1,
+      "parentId": null,
+      "createdAt": "2025-06-20T15:07:10.000Z",
+      "likes": 1,
+      "likedUserIds": [],
+      "id": 7
+    },
+    {
+      "text": "저 8월에 입었는데 생각보다 안 덥고 진짜 사진 잘 나왔어요!!",
+      "postId": "9",
+      "userId": 2,
+      "parentId": null,
+      "createdAt": "2025-06-20T15:20:31.000Z",
+      "likes": 6,
+      "likedUserIds": [],
+      "id": 8
+    },
+    {
+      "text": "기모노 샵 중에 '유메야카타' 추천이요~ 스탭도 친절하고 종류 많아요!",
+      "postId": "9",
+      "userId": 4,
+      "parentId": null,
+      "createdAt": "2025-06-20T15:22:02.000Z",
+      "likes": 3,
+      "likedUserIds": [],
+      "id": 9
+    },
+    {
+      "text": "ㅋㅋ 저도 자판기에서 따뜻한 오뎅 국물 뽑아먹음 감동했어요",
+      "postId": "10",
+      "userId": 3,
+      "parentId": null,
+      "createdAt": "2025-06-20T15:24:18.000Z",
+      "likes": 10,
+      "likedUserIds": [],
+      "id": 10
+    },
+    {
+      "text": "라멘 자판기도 신세계였어요 ㄹㅇ…",
+      "postId": "10",
+      "userId": 2,
+      "parentId": null,
+      "createdAt": "2025-06-20T15:25:11.000Z",
+      "likes": 4,
+      "likedUserIds": [],
+      "id": 11
+    },
+    {
+      "text": "별로 재미없던데요?",
+      "postId": "3",
+      "userId": 2,
+      "parentId": null,
+      "createdAt": "2025-06-20T14:50:42.981Z",
+      "likes": 0,
+      "likedUserIds": [],
+      "id": 12
+    },
+    {
+      "text": "우마이 우마이",
+      "postId": "6",
+      "userId": 2,
+      "parentId": null,
+      "createdAt": "2025-06-20T14:51:26.160Z",
+      "likes": 0,
+      "likedUserIds": [],
+      "id": 13
+    },
+    {
+      "text": "123",
+      "postId": "11",
+      "userId": 5,
+      "parentId": 14,
+      "createdAt": "2025-06-20T16:00:52.253Z",
+      "likes": 0,
+      "likedUserIds": [],
+      "id": 17
+    },
+    {
+      "text": "123",
+      "postId": "11",
+      "userId": 5,
+      "parentId": null,
+      "createdAt": "2025-06-20T16:01:27.252Z",
+      "likes": 0,
+      "likedUserIds": [],
+      "id": 18
+    },
+    {
+      "text": "1234",
+      "postId": "9",
+      "userId": 5,
+      "parentId": 8,
+      "createdAt": "2025-06-20T16:05:41.696Z",
+      "likes": 0,
+      "likedUserIds": [],
+      "id": 19
+    },
+    {
+      "text": "1234",
+      "postId": "9",
+      "userId": 5,
+      "parentId": null,
+      "createdAt": "2025-06-20T16:05:55.299Z",
+      "likes": 0,
+      "likedUserIds": [],
+      "id": 20
+    }
+  ],
+  "messages": [
+    {
+      "senderId": 3,
+      "receiverId": "4",
+      "title": "일본취업",
+      "content": "같이해요",
+      "createdAt": "2025-06-20T13:49:52.292Z",
+      "isRead": true,
+      "id": 1
+    },
+    {
+      "senderId": 3,
+      "receiverId": "4",
+      "title": "그래요 ",
+      "content": "열심히 공부합시다",
+      "createdAt": "2025-06-20T13:50:11.523Z",
+      "isRead": true,
+      "id": 2
+    },
+    {
+      "senderId": 3,
+      "receiverId": "1",
+      "title": "프로젝트",
+      "content": "어느 부분을 수정할까요?",
+      "createdAt": "2025-06-20T13:50:26.308Z",
+      "isRead": true,
+      "id": 3
+    },
+    {
+      "senderId": 1,
+      "receiverId": "3",
+      "title": "수정할 부분은요",
+      "content": "여행 소개 페이지는 어떨까요?",
+      "createdAt": "2025-06-20T13:50:50.695Z",
+      "isRead": true,
+      "id": 4
+    },
+    {
+      "senderId": 4,
+      "receiverId": "2",
+      "title": "어학연수",
+      "content": "어디로 가나요?",
+      "createdAt": "2025-06-20T13:51:57.396Z",
+      "isRead": true,
+      "id": 5
+    },
+    {
+      "senderId": 2,
+      "receiverId": "4",
+      "title": "어학연수 장소는",
+      "content": "오사카 외국어 학원입니다.",
+      "createdAt": "2025-06-20T13:52:52.381Z",
+      "isRead": true,
+      "id": 6
+    },
+    {
+      "senderId": 2,
+      "receiverId": "5",
+      "title": "게시판 기능",
+      "content": "어떤 것들이 있나요?",
+      "createdAt": "2025-06-20T13:53:39.181Z",
+      "isRead": true,
+      "id": 7
+    },
+    {
+      "senderId": 5,
+      "receiverId": "2",
+      "title": "게시판 기능 설명",
+      "content": "조회수순, 최신순으로 정렬 가능해요",
+      "createdAt": "2025-06-20T13:54:24.534Z",
+      "isRead": true,
+      "id": 8
+    },
+    {
+      "senderId": 1,
+      "receiverId": "5",
+      "title": "게시판 검색 기능",
+      "content": "어떤 것들이 있나요?",
+      "createdAt": "2025-06-20T13:55:18.591Z",
+      "isRead": true,
+      "id": 9
+    },
+    {
+      "senderId": 5,
+      "receiverId": "1",
+      "title": "게시판 검색 기능",
+      "content": "제목\n제목+작성자\n등이 있어요",
+      "createdAt": "2025-06-20T13:55:51.256Z",
+      "isRead": true,
+      "id": 10
+    },
+    {
+      "senderId": 2,
+      "receiverId": "1",
+      "title": "현지학기제 소개 페이지",
+      "content": "게시글 추가시에 이미지를 첨부할 수 있나요?",
+      "createdAt": "2025-06-20T13:56:34.545Z",
+      "isRead": true,
+      "id": 11
+    },
+    {
+      "senderId": 1,
+      "receiverId": "2",
+      "title": "현지학기제 소개 페이지 회신",
+      "content": "네. 이미지 첨부가 가능합니다",
+      "createdAt": "2025-06-20T13:57:13.386Z",
+      "isRead": true,
+      "id": 12
+    },
+    {
+      "senderId": 3,
+      "receiverId": "5",
+      "title": "게시판 이용 방법",
+      "content": "검색시에 띄어쓰기를 해도 검색이 될까요?",
+      "createdAt": "2025-06-20T13:59:02.098Z",
+      "isRead": true,
+      "id": 13
+    },
+    {
+      "title": "답장 테스트",
+      "content": "답장 테스트",
+      "senderId": 5,
+      "receiverId": 3,
+      "createdAt": "2025-06-20T16:15:52.285Z",
+      "isRead": false,
+      "id": 14
+    }
+  ],
+  "members": [
+    {
+      "imageUrl": "",
+      "name": "강희준",
+      "introduction": "안녕하세요, 강희준입니다.",
+      "authorId": 1,
+      "id": 1
+    },
+    {
+      "name": "이창민",
+      "introduction": "안녕하세요, 이창민입니다.",
+      "imageUrl": "",
+      "authorId": 5,
+      "id": 2
+    },
+    {
+      "name": "김성민",
+      "introduction": "안녕하세요, 김성민입니다.",
+      "imageUrl": "",
+      "authorId": 2,
+      "id": 3
+    },
+    {
+      "name": "권혁빈",
+      "introduction": "안녕하세요, 권혁빈입니다.",
+      "imageUrl": "",
+      "authorId": 3,
+      "id": 4
+    },
+    {
+      "name": "이유찬",
+      "imageUrl": "",
+      "introduction": "안녕하세요, 이유찬입니다.",
+      "authorId": 4,
+      "id": 5
+    }
+  ]
+}

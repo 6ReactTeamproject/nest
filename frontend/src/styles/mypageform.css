@@ -1,0 +1,51 @@
+.mypage-form {
+  background-color: white;
+  padding: 40px 30px;
+  max-width: 600px;
+  margin: 60px ;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mypage-form-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.mypage-form-input {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.mypage-form-button {
+  padding: 12px 24px;
+  background-color: #2563eb;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.mypage-form-button:hover {
+  background-color: #1e40af;
+}
+
+.mypage-form-error {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 6px;
+  text-align: center;
+}

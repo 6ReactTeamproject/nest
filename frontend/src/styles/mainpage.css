@@ -1,0 +1,98 @@
+/* styles/mainpage.css */
+
+/* 전체 배경 및 폰트 설정 */
+body {
+  font-family: "Segoe UI", "Apple SD Gothic Neo", sans-serif;
+  background-color: #f4f6f9;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+/* 홈 페이지 컨테이너 */
+.home-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+/* 추천 여행지 섹션 */
+.carousel-container {
+  margin-bottom: 40px;
+}
+
+.carousel-container h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #222;
+}
+
+/* 캐러셀 카드 */
+.carousel-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.carousel-card:hover {
+  transform: translateY(-4px);
+}
+
+.carousel-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.carousel-text {
+  padding: 16px;
+}
+
+.carousel-text h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.carousel-text p {
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+}
+
+/* 인기 게시글 섹션 */
+.top-posts {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-top: 20px;
+}
+
+.top-posts h2 {
+  font-size: 22px;
+  margin-bottom: 16px;
+  border-left: 4px solid #4285f4;
+  padding-left: 12px;
+  color: #333;
+}
+
+.top-posts ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.top-posts li {
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.top-posts li:hover {
+  background-color: #f1f3f5;
+}

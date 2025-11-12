@@ -1,0 +1,45 @@
+.upload-img-wrapper {
+  position: relative;
+  width: 125px;
+  height: 125px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.profile-img {
+  width: 125px;
+  height: 125px;
+  object-fit: cover;
+  border-radius: 70%;
+  border: 3px solid #4e5bed;
+  box-sizing: border-box;
+  display: block;
+}
+
+.edit-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 125px;
+  height: 125px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.upload-img-wrapper:hover .edit-overlay {
+  opacity: 1;
+}
+
+.edit-icon-img {
+  width: 28px;
+  height: 28px;
+  pointer-events: none;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.4));
+}

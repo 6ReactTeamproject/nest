@@ -1,0 +1,19 @@
+"* text=auto" 
+# 모든 텍스트 파일에 LF 줄바꿈 적용
+* text=auto
+
+# 코드 파일은 LF 강제
+*.js   text eol=lf
+*.jsx  text eol=lf
+*.ts   text eol=lf
+*.tsx  text eol=lf
+*.css  text eol=lf
+*.html text eol=lf
+*.json text eol=lf
+*.md   text eol=lf
+
+# 바이너리 파일은 줄바꿈 처리하지 않음
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary

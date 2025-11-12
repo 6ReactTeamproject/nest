@@ -1,0 +1,95 @@
+/* 회원가입 전체 화면 */
+.signup-page {
+  min-height: 100vh;
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* 상단 홈으로 버튼 */
+.back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* 박스 스타일 */
+.signup-box {
+  background: white;
+  padding: 32px 24px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  gap: 12px;
+}
+
+/* 기본 input 스타일 */
+.signup-box input {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* 중복확인 줄 (input + button 같이 정렬) */
+.id-check {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.id-check input {
+  flex: 1;
+}
+
+.id-check button {
+  height: 42px;
+  padding: 0 16px;
+  font-size: 0.95rem;
+  background-color: #5b4fe5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 경고 텍스트 */
+.warn {
+  font-size: 0.85rem;
+  color: red;
+}
+
+/* 회원가입 버튼 */
+.signup-box button {
+  padding: 10px;
+  font-size: 1rem;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
