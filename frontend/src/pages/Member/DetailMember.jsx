@@ -69,7 +69,7 @@ function DetailMember() {
           <>
             {/* 이미지가 있을 경우 출력 */}
             {members.imageUrl && (
-              <img
+              <img  
                 src={members.imageUrl}
                 alt="preview"
                 style={{ maxWidth: "340px", borderRadius: "8px" }}
