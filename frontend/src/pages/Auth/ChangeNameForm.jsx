@@ -1,53 +1,43 @@
 import React, { useState } from 'react';
 import { useUser } from "../../hooks/UserContext";
+import { useToast } from "../../components/common/Toast";
+import { apiPatch } from "../../api/fetch";
 import MypageLayout from "./MypageLayout";
-import "../../styles/mypageform.css"; // 공통 스타일 import
+import { MESSAGES } from "../../constants";
+import "../../styles/mypageform.css";
 
 export default function ChangeNameForm() {
-  const { user, setUser } = useUser(); // 로그인된 사용자 정보와 상태 변경 함수 가져오기
-  const [name, setName] = useState(""); // 입력된 닉네임 상태
-  const [isValid, setIsValid] = useState(true); // 닉네임 유효성 여부
+  const { user, setUser } = useUser();
+  const [name, setName] = useState("");
+  const [isValid, setIsValid] = useState(true);
+  const { success, error: showError } = useToast();
 
-  // 로그인되지 않은 상태에서는 안내 메시지 출력
-  if (!user) return <p>로그인이 필요합니다.</p>;
+  if (!user) return <p>{MESSAGES.LOGIN_NEEDED}</p>;
 
-  // 한글, 영문, 숫자만 허용하는 정규표현식
   const nameRegex = /^[가-힣a-zA-Z0-9]+$/;
 
-  // 폼 제출 시 실행되는 함수
   const handleSubmit = async (e) => {
-    e.preventDefault(); // 기본 폼 제출 동작 방지
+    e.preventDefault();
 
-    // 닉네임이 정규식에 맞지 않으면 오류 처리
     if (!nameRegex.test(name)) {
       setIsValid(false);
       return;
     }
 
-    // 현재 닉네임과 동일한 값 입력 시 알림
     if (name === user.name) {
-      alert('현재 닉네임과 동일합니다.');
+      showError('현재 닉네임과 동일합니다.');
       return;
     }
 
-    // 서버에 PATCH 요청을 보내 닉네임 업데이트
     try {
-      const res = await fetch(`http://localhost:3001/users/${user.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name })
-      });
-
-      // 응답으로 받은 사용자 정보로 context와 localStorage 업데이트
-      const updatedUser = await res.json();
+      const updatedUser = await apiPatch("user", user.id, { name });
       setUser({ ...user, name: updatedUser.name });
       localStorage.setItem('user', JSON.stringify({ ...user, name: updatedUser.name }));
 
-      alert('닉네임이 변경되었습니다.');
-      setName(""); // 입력 필드 초기화
+      success(MESSAGES.NAME_CHANGE_SUCCESS);
+      setName("");
     } catch (err) {
-      console.error(err);
-      alert('닉네임 변경 중 오류가 발생했습니다.');
+      showError(err.message || MESSAGES.NAME_CHANGE_FAIL);
     }
   };
 

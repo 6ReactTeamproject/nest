@@ -13,8 +13,11 @@ const TopPosts = () => {
     const fetchData = async () => {
       try {
         // 전체 게시글과 사용자 목록을 API로부터 받아옴
-        const allPosts = await apiGet("posts/info");
-        const allUsers = await apiGet("users/info");
+        const postsRes = await apiGet("posts/info");
+        const usersRes = await apiGet("user/info");
+        
+        const allPosts = postsRes.data ?? postsRes;
+        const allUsers = usersRes.data ?? usersRes;
 
         // 게시글을 조회수 기준으로 내림차순 정렬, 상위 5개만 저장
         const sorted = [...allPosts].sort((a, b) => b.views - a.views);

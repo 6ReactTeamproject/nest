@@ -1,7 +1,7 @@
 import { useState, Children, cloneElement } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "../../hooks/UserContext";
 import { apiPost } from "../../api/fetch";
+import { useToast } from "../common/Toast";
 import FormButton from "../common/FormButton";
 import { MESSAGES } from "../../constants";
 import "../../styles/form.css";
@@ -13,26 +13,23 @@ export default function CreateButton({
   children,
 }) {
   const navigate = useNavigate();
-  const { user } = useUser();
   const [inputs, setInputs] = useState({});
+  const { success, error: showError } = useToast();
 
   const handleSubmit = async () => {
     if (!empty(inputs)) {
-      alert(MESSAGES.REQUIRED_FIELD);
+      showError(MESSAGES.REQUIRED_FIELD);
       return;
     }
 
     try {
       await apiPost(endpoint, {
         ...inputs,
-        authorId: user.id,
       });
-      alert(MESSAGES.CREATE_SUCCESS);
-      // 등록 성공 시 지정된 경로로 이동
+      success(MESSAGES.CREATE_SUCCESS);
       navigate(redirect);
-    } catch (error) {
-      alert(MESSAGES.CREATE_FAIL);
-      console.error(error);
+    } catch (err) {
+      showError(err.message || MESSAGES.CREATE_FAIL);
     }
   };
 

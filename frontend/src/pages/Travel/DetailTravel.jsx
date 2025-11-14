@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { apiGet } from "../../api/fetch";
 import DeleteButton from "../../components/Travel&Member/DeleteButton";
 import EditTravelIntro from "./EditTravelIntro";
 import { useUser } from "../../hooks/UserContext";
@@ -18,16 +19,17 @@ export default function DetailTravel() {
 
   // 컴포넌트가 마운트되거나 id가 바뀔 때 해당 장소 정보 불러오기
   useEffect(() => {
-    fetch(`http://localhost:3001/semester/${id}`)
-      .then((res) => res.json())
-      .then((data) => setTravelPlace(data));
+    apiGet("semester", id)
+      .then((data) => setTravelPlace(data))
+      .catch((err) => console.error("여행지 정보 불러오기 실패:", err));
   }, [id]);
 
   // 데이터가 아직 로딩 중일 경우 표시
   if (!travelPlace) return <p>로딩 중...</p>;
 
-  // 로그인한 사용자가 글 작성자인지 확인
-  const isOwner = String(user?.id) === String(travelPlace.authorId);
+  // 로그인한 사용자가 글 작성자인지 확인 (authorId 또는 author.id 사용)
+  const authorId = travelPlace.authorId || travelPlace.author?.id;
+  const isOwner = user && compareIds(user.id, authorId);
 
   return (
     <div

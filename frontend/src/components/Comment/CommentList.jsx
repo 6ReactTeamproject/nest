@@ -3,7 +3,9 @@ import CommentEditForm from "./CommentEditForm";
 import CommentActions from "./CommentActions";
 import LikeButton from "./LikeButton";
 import CommentForm from "./CommentForm";
-import { apiPatch } from "../../api/fetch";
+import { apiPatch, apiDelete } from "../../api/fetch";
+import { useToast } from "../common/Toast";
+import { MESSAGES } from "../../constants";
 import "../../styles/comment.css";
 
 // 댓글/대댓글 목록 컴포넌트
@@ -13,9 +15,10 @@ export default function CommentList({
   users,           // 사용자 정보 배열
   currentUser,     // 로그인 중인 사용자 정보
 }) {
-  const [editingCommentId, setEditingCommentId] = useState(null); // 수정 중인 댓글
-  const [sortType, setSortType] = useState("latest");                    // 정렬 방식
-  const [replyTo, setReplyTo] = useState(null);                    // 답글을 작성 중인 댓글
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [sortType, setSortType] = useState("latest");
+  const [replyTo, setReplyTo] = useState(null);
+  const { success, error: showError } = useToast();
 
   // 특정 댓글의 대댓글
   const getReplies = (parentId) =>
@@ -27,55 +30,49 @@ export default function CommentList({
   };
 
   // 댓글 수정/저장
-  const handleSave = (commentId, newText) => {
-    // 댓글 목록에서 해당 댓글 찾아서 텍스트만 바꿔줌
-    setComments((prev) =>
-      prev.map((c) => (c.id === commentId ? { ...c, text: newText } : c))
-    );
-    // 수정 모드 해제
-    setEditingCommentId(null);
+  const handleSave = async (commentId, newText) => {
+    try {
+      await apiPatch("comments", commentId, { text: newText });
+      setComments((prev) =>
+        prev.map((c) => (c.id === commentId ? { ...c, text: newText } : c))
+      );
+      setEditingCommentId(null);
+      success(MESSAGES.COMMENT_UPDATE_SUCCESS);
+    } catch (err) {
+      showError(err.message || MESSAGES.COMMENT_UPDATE_FAIL);
+    }
   };
 
   // 댓글 삭제
-  const handleDelete = (comment) => {
-    if (window.confirm("삭제할까요?")) {
-      setComments((prev) => prev.filter((c) => c.id !== comment.id));
+  const handleDelete = async (comment) => {
+    if (window.confirm(MESSAGES.DELETE_CONFIRM)) {
+      try {
+        await apiDelete("comments", comment.id);
+        setComments((prev) => prev.filter((c) => c.id !== comment.id));
+        success(MESSAGES.COMMENT_DELETE_SUCCESS);
+      } catch (err) {
+        showError(err.message || MESSAGES.COMMENT_DELETE_FAIL);
+      }
     }
   };
 
   // 댓글 좋아요 처리
   const handleLike = async (comment, alreadyLiked) => {
     if (!currentUser) {
-      alert("좋아요를 누르려면 로그인이 필요합니다.");
+      showError(MESSAGES.LOGIN_REQUIRED);
       return;
     }
     try {
-      // 이미 좋아요 눌렀으면 -1, 아니면 +1
-      const updatedLikes = alreadyLiked
-        ? Math.max(0, comment.likes - 1)
-        : comment.likes + 1;
-      // likedUserIds 배열에서 현재 유저 id 추가/제거
-      const updatedLikedUserIds = alreadyLiked
-        ? comment.likedUserIds.filter((id) => id !== currentUser.id)
-        : [...comment.likedUserIds, currentUser.id];
-
-      // 서버에 PATCH 요청
-      await apiPatch("comments", comment.id, {
-        likes: updatedLikes,
-        likedUserIds: updatedLikedUserIds,
-      });
-
-      // 상태 업데이트
+      const updatedComment = await apiPatch("comments", `${comment.id}/like`, {});
       setComments((prev) =>
         prev.map((c) =>
           c.id === comment.id
-            ? { ...c, likes: updatedLikes, likedUserIds: updatedLikedUserIds }
+            ? { ...c, likes: updatedComment.likes, likedUserIds: updatedComment.likedUserIds || [] }
             : c
         )
       );
-    } catch (error) {
-      console.error("좋아요 업데이트 실패:", error);
-      alert("좋아요 업데이트에 실패했습니다.");
+    } catch (err) {
+      showError(err.message || "좋아요 업데이트에 실패했습니다.");
     }
   };
 

@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useUser } from "../../hooks/UserContext";
+import { useToast } from "../common/Toast";
 import MessageList from "./MessageList";
 import MessageDetail from "./MessageDetail";
 import MessageForm from "./MessageForm";
+import { MESSAGES } from "../../constants";
 import "./Message.css";
 import { useNavigate } from "react-router-dom";
 
@@ -13,12 +15,16 @@ const MessageBox = () => {
   const [showForm, setShowForm] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const nav = useNavigate();
+  const { error: showError } = useToast();
+  const hasRedirected = useRef(false);
 
-  // 로그인 상태 확인
   useEffect(() => {
-    if (!user) {
-      alert("로그인 후 이용해주세요."); // 비로그인 시 경고창
-      nav("/login");                   // 로그인 페이지로 리다이렉트
+    if (!user && !hasRedirected.current) {
+      hasRedirected.current = true;
+      showError(MESSAGES.LOGIN_NEEDED);
+      nav("/login");
+    } else if (user) {
+      hasRedirected.current = false;
     }
   }, [user, nav]);
 

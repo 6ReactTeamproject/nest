@@ -8,6 +8,6 @@ const menuItems = [
   { path: "/message", label: "쪽지함" },
 ];
 
-export default function   SidebarHome() {
+export default function SidebarHome() {
   return <SidebarMenu menuItems={menuItems} />;
 }

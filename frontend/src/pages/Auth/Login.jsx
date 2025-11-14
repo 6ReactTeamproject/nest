@@ -1,46 +1,53 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "../../hooks/UserContext"; // 사용자 정보 Context 훅 import
+import { useUser } from "../../hooks/UserContext";
+import { useToast } from "../../components/common/Toast";
+import { API_BASE_URL, MESSAGES } from "../../constants";
 import "../../styles/Login.css";
 
 export default function Login() {
-  // 아이디, 비밀번호 입력값 관리 상태 정의 
   const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
-
-  // 페이지 이동을 위한 훅
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-
-  // 로그인 성공시 전역 사용자 정보를 저장
   const { setUser } = useUser();
+  const { success, error: showError } = useToast();
 
-  // 로그인 처리 함수
-  const handleLogin = () => {
-    // 로그인 API 호출 : GET 쿼리로 아이디, 비밀번호를 전달
-    fetch(`http://localhost:3001/users?loginId=${loginId}&password=${password}`)
-      .then((res) => res.json())
-      .then((data) => {
+  const handleLogin = async () => {
+    if (!loginId.trim() || !password.trim()) {
+      showError(MESSAGES.REQUIRED_FIELD);
+      return;
+    }
 
-        // 로그인 성공 : 조건에 맞는 유저가 배열로 반환될 경우 1
-        if (data.length > 0) {
-          const user = data[0];
-
-          // 로그인 성공한 유저 정보 로컬스토리지 저장
-          localStorage.setItem("user", JSON.stringify(user));
-          setUser(user);
-          // 세션에 저장된 마지막 비인증 페이지 경로 가져오기
-          const lastPublic = sessionStorage.getItem("lastPublicPath") || "/";
-          // 만약 lastPublic이 로그인 또는 회원가입 페이지라면 기본값을 "/"
-          const target =
-            lastPublic === "/login" || lastPublic === "/signup"
-              ? "/"
-              : lastPublic;
-          // 설정된 경로로 페이지 이동    
-          navigate(target);
-        } else {
-          alert("로그인 실패");
-        }
+    try {
+      setIsLoading(true);
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ loginId, password }),
       });
+
+      if (!res.ok) {
+        const error = await res.json();
+        showError(error.message || MESSAGES.LOGIN_FAIL);
+        return;
+      }
+
+      const data = await res.json();
+      localStorage.setItem("access_token", data.access_token);
+      localStorage.setItem("refresh_token", data.refresh_token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      setUser(data.user);
+
+      const lastPublic = sessionStorage.getItem("lastPublicPath") || "/";
+      const target = lastPublic === "/login" || lastPublic === "/signup" ? "/" : lastPublic;
+      success("로그인 성공!");
+      navigate(target);
+    } catch (err) {
+      showError(err.message || "로그인 중 오류가 발생했습니다.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -57,7 +64,9 @@ export default function Login() {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="비밀번호"
         />
-        <button onClick={handleLogin}>로그인</button>
+        <button onClick={handleLogin} disabled={isLoading}>
+          {isLoading ? MESSAGES.LOADING : "로그인"}
+        </button>
       </div>
       <button className="signup-button" onClick={() => navigate("/signup")}>
         회원가입

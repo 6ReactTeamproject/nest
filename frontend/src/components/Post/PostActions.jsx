@@ -1,42 +1,40 @@
 import { apiDelete } from "../../api/fetch";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useToast } from "../common/Toast";
+import { MESSAGES } from "../../constants";
+import { compareIds } from "../../utils/helpers";
 import "../../styles/post.css";
 
-// 게시글 액션 버튼 컴포넌트
-function PostActions({ post, currentUser, id, navigate }) {
+function PostActions({ post, currentUser, id }) {
   const location = useLocation();
-  const navigateTo = useNavigate();
+  const navigate = useNavigate();
+  const { success, error: showError } = useToast();
 
-  // 게시글 삭제 처리
-  const handleDelete = () => {
-    // 삭제 확인창 띄우기
-    if (window.confirm("정말 삭제하시겠습니까?")) {
-      // 서버에 DELETE 요청
-      apiDelete("posts", id)
-        .then(() => {
-          // 게시판에서 왔다면 해당 페이지로 돌아가기
-          if (location.state?.fromBoard) {
-            let url = "/post";
-            const params = [];
-            if (location.state.page) params.push(`page=${location.state.page}`);
-            if (location.state.sort) params.push(`sort=${location.state.sort}`);
-            if (params.length > 0) url += "?" + params.join("&");
-            navigateTo(url);
-          } else {
-            // 이전 페이지로 이동
-            navigate(-1);
-          }
-        })
-        .catch((error) => {
-          console.error("게시글 삭제 실패:", error);
-          alert("게시글 삭제에 실패했습니다.");
-        });
+  const handleDelete = async () => {
+    if (window.confirm(MESSAGES.DELETE_CONFIRM)) {
+      try {
+        await apiDelete("posts", id);
+        success("게시글이 삭제되었습니다.");
+        
+        if (location.state?.fromBoard) {
+          let url = "/post";
+          const params = [];
+          if (location.state.page) params.push(`page=${location.state.page}`);
+          if (location.state.sort) params.push(`sort=${location.state.sort}`);
+          if (params.length > 0) url += "?" + params.join("&");
+          navigate(url);
+        } else {
+          navigate(-1);
+        }
+      } catch (err) {
+        showError(err.message || "게시글 삭제에 실패했습니다.");
+      }
     }
   };
 
   // 게시글 수정 페이지로 이동
   const handleEdit = () => {
-    navigateTo(`/post/edit/${id}`, {
+    navigate(`/post/edit/${id}`, {
       state: {
         fromBoard: location.state?.fromBoard,
         page: location.state?.page,
@@ -46,8 +44,7 @@ function PostActions({ post, currentUser, id, navigate }) {
   };
 
   // 작성자만 수정/삭제 버튼 표시
-  const isAuthor =
-    currentUser && post && String(currentUser.id) === String(post.userId);
+  const isAuthor = currentUser && post && compareIds(currentUser.id, post.userId);
 
   return (
     <div className="post-actions-container">

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { apiGet, apiPatch } from "../../api/fetch";
 import { useUser } from "../../hooks/UserContext";
+import { useToast } from "../common/Toast";
+import { compareIds, formatDateOnly } from "../../utils/helpers";
 import { useNavigate } from "react-router-dom";
 
 const MessageList = ({
@@ -12,32 +14,37 @@ const MessageList = ({
   const { user } = useUser();
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState([]);
+  const { error: showError } = useToast();
 
-  // 사용자 정보와 메시지 목록을 가져오는 useEffect
   useEffect(() => {
-    if (!user) return;
+    const loadData = async () => {
+      if (!user) return;
 
-    // 사용자 목록 가져오기
-    apiGet("users/info")
-      .then((data) => setUsers(data))
-      .catch((err) => console.error("사용자 목록 로딩 실패:", err));
+      try {
+        const [usersRes, messagesData] = await Promise.all([
+          apiGet("user/info"),
+          apiGet("messages/all"),
+        ]);
 
-    // 메시지 목록 가져오기
-    apiGet("messages")
-      .then((data) => {
-        // 받은 쪽지/보낸 쪽지 필터링
-        const filteredMessages = data.filter((message) =>
+        const usersList = usersRes.data ?? usersRes;
+        setUsers(Array.isArray(usersList) ? usersList : []);
+
+        const filteredMessages = messagesData.filter((message) =>
           activeTab === "received"
-            ? String(message.receiverId) === String(user.id) // 받은 쪽지 필터
-            : String(message.senderId) === String(user.id) // 보낸 쪽지 필터
+            ? compareIds(message.receiverId, user.id)
+            : compareIds(message.senderId, user.id)
         );
-        // 최신순으로 정렬 (createdAt 기준 내림차순)
+        
         const sortedMessages = filteredMessages.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
         setMessages(sortedMessages);
-      })
-      .catch((err) => console.error("메시지 로딩 실패:", err));
+      } catch (err) {
+        showError("데이터를 불러오는데 실패했습니다.");
+      }
+    };
+
+    loadData();
   }, [user, activeTab, showForm]);
 
   // 메시지 클릭 시 읽음 처리 및 선택
@@ -66,9 +73,8 @@ const MessageList = ({
     return null;
   }
 
-  // 사용자 ID로 사용자 이름 찾기
   const getSenderName = (userId) => {
-    const foundUser = users.find((u) => String(u.id) === String(userId));
+    const foundUser = users.find((u) => compareIds(u.id, userId));
     return foundUser ? foundUser.name : "알 수 없음";
   };
 
@@ -93,7 +99,7 @@ const MessageList = ({
                   : getSenderName(message.receiverId)} {/* 보낸 쪽지일 땐 받는 사람 이름 표시 */}
               </span>
               <span className="date">
-                {new Date(message.createdAt).toLocaleDateString()}
+                {formatDateOnly(message.createdAt)}
               </span>
             </div>
             <div className="message-content-preview">{message.title}</div>

@@ -1,63 +1,45 @@
 import React, { useState } from "react";
 import { useUser } from "../../hooks/UserContext";
+import { useToast } from "../../components/common/Toast";
 import MypageLayout from "./MypageLayout";
+import { apiPatch } from "../../api/fetch";
+import { MESSAGES } from "../../constants";
 import "../../styles/mypageform.css";
 
 export default function ChangePasswordForm() {
-  const { user } = useUser(); // 로그인한 사용자 정보 가져오기
-  const [currentPw, setCurrentPw] = useState(""); // 현재 비밀번호 입력값 상태
-  const [newPw, setNewPw] = useState(""); // 새 비밀번호 입력값 상태
-  const [confirmPw, setConfirmPw] = useState(""); // 새 비밀번호 확인 입력값 상태
+  const { user } = useUser();
+  const [currentPw, setCurrentPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
+  const { success, error: showError } = useToast();
 
-  // 로그인하지 않은 경우 메시지 출력
-  if (!user) return <p>로그인이 필요합니다.</p>;
+  if (!user) return <p>{MESSAGES.LOGIN_NEEDED}</p>;
 
-  // 폼 제출 시 실행되는 함수
   const handleSubmit = async (e) => {
-    e.preventDefault(); // 기본 제출 동작 방지
+    e.preventDefault();
 
-    // 입력 필드 중 하나라도 비어 있으면 경고
     if (!currentPw || !newPw || !confirmPw) {
-      alert("모든 비밀번호 필드를 입력해주세요.");
+      showError("모든 비밀번호 필드를 입력해주세요.");
       return;
     }
 
-    // 새 비밀번호와 확인 비밀번호가 다르면 경고
     if (newPw !== confirmPw) {
-      alert("새 비밀번호가 일치하지 않습니다.");
+      showError("새 비밀번호가 일치하지 않습니다.");
       return;
     }
 
     try {
-      // 현재 사용자의 비밀번호를 서버에서 다시 가져옴
-      const res = await fetch(`http://localhost:3001/users/${user.id}`);
-      const userData = await res.json();
-
-      // 입력한 현재 비밀번호와 서버에 저장된 비밀번호 비교
-      if (userData.password !== currentPw) {
-        alert("현재 비밀번호가 틀립니다.");
-        return;
-      }
-
-      // 비밀번호가 맞으면 PATCH 요청으로 새 비밀번호 저장
-      const updateRes = await fetch(`http://localhost:3001/users/${user.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: newPw }),
+      await apiPatch("user", user.id, {
+        password: newPw,
+        currentPassword: currentPw,
       });
 
-      if (updateRes.ok) {
-        alert("비밀번호가 성공적으로 변경되었습니다.");
-        // 입력 필드 초기화
-        setCurrentPw("");
-        setNewPw("");
-        setConfirmPw("");
-      } else {
-        alert("비밀번호 변경 실패: 서버 오류");
-      }
-    } catch (error) {
-      console.error("비밀번호 변경 중 오류:", error);
-      alert("비밀번호 변경 실패: 통신 오류");
+      success(MESSAGES.PASSWORD_CHANGE_SUCCESS);
+      setCurrentPw("");
+      setNewPw("");
+      setConfirmPw("");
+    } catch (err) {
+      showError(err.message || MESSAGES.PASSWORD_CHANGE_FAIL);
     }
   };
 

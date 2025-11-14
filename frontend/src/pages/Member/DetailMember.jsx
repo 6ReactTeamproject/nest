@@ -1,34 +1,32 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { apiGet } from "../../api/fetch";
 import EditMember from "./EditMember";
 import DeleteButton from "../../components/Travel&Member/DeleteButton";
 import { useUser } from "../../hooks/UserContext";
+import { compareIds } from "../../utils/helpers";
 import "../../styles/travel.css";
 import "../../styles/post.css";
 
-const API_URL = "http://localhost:3001/members";
-
 function DetailMember() {
-  const [members, setMembers] = useState(null); // 멤버 상세 정보를 저장
-  const [isEditing, setIsEditing] = useState(false); // 수정 모드 여부
-  const { id } = useParams(); // URL에서 멤버 ID 가져오기
+  const [members, setMembers] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useUser(); // 현재 로그인한 사용자 정보
+  const { user } = useUser();
 
   useEffect(() => {
-    // 해당 멤버 정보를 서버에서 받아와 state에 저장
-    fetch(`${API_URL}/${id}`, {
-      method: "GET",
-    })
-      .then((res) => res.json())
+    apiGet("members", id)
       .then((data) => {
         setMembers(data);
-      });
+      })
+      .catch((err) => console.error("멤버 정보 불러오기 실패:", err));
   }, [id]);
 
-  if (!members) return <p>로딩 중...</p>; // 데이터가 로딩 중일 때 표시
+  if (!members) return <p>로딩 중...</p>;
 
-  const isOwner = String(user?.id) === String(members.authorId); // 작성자 여부 확인
+  const memberUserId = members.user_id || members.user?.id;
+  const isOwner = user && compareIds(user.id, memberUserId);
 
   return (
     <>

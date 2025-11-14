@@ -89,6 +89,6 @@ export const useRouteHistory = () => {
     routeHistory.current.push(location.pathname);
   }, [location, navType, nav, user]);
 
-  // 방문 기록 객체 리턴
-  return { routeHistory, customHistory };
+  // 반환값이 사용되지 않지만, 필요시 사용할 수 있도록 유지
+  // return { routeHistory, customHistory };
 };
