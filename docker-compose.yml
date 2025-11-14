@@ -28,6 +28,10 @@
       working_dir: /app
       depends_on:
         - db
+      environment:
+        # JWT 설정
+        JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+        JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
       # npm install을 실행하고, 개발 모드로 NestJS 실행
       command: sh -c "npm install && npm run start:dev"
     
