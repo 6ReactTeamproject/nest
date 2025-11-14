@@ -8,25 +8,18 @@ import { MESSAGES } from "../../constants";
 import "../../styles/form.css";
 import "../../styles/post.css";
 
-const PostForm = ({ post, setPost, onSubmit, id }) => {
+const PostForm = ({ post, setPost, onSubmit, id, isLoading = false }) => {
   const nav = useNavigate();
 
-  // 입력값 변경 처리 함수
   const handleChange = (e) => {
     const { name, value } = e.target;
     setPost((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault(); // 제목 입력 확인
-    if (!post.title.trim()) {
-      alert(MESSAGES.REQUIRED_FIELD);
-      return;
-    }
-    // 내용 입력 확인
-    if (!post.content.trim()) {
-      alert(MESSAGES.REQUIRED_FIELD);
-      return;
+    e.preventDefault();
+    if (!post.title.trim() || !post.content.trim()) {
+      return; // WritePost에서 처리
     }
     onSubmit();
   };
@@ -60,8 +53,8 @@ const PostForm = ({ post, setPost, onSubmit, id }) => {
           취소
         </button>
         {/* 제출 버튼 "수정", 없으면 "작성" */}
-        <button type="submit" className="post-form-submit-button">
-          {id ? "수정" : "작성"}
+        <button type="submit" className="post-form-submit-button" disabled={isLoading}>
+          {isLoading ? MESSAGES.LOADING : (id ? "수정" : "작성")}
         </button>
       </div>
     </form>

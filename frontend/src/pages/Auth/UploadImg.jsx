@@ -1,42 +1,38 @@
 import React, { useRef, useState } from "react";
 import { useUser } from "../../hooks/UserContext";
+import { useToast } from "../../components/common/Toast";
+import { apiPatch } from "../../api/fetch";
 import "../../styles/UploadImg.css"
 import CropModal from "../../utils/CropModal";
 
 export default function UploadImg({ shape = "round" }) {
-  const { user, setUser } = useUser(); // 로그인 사용자 정보와 업데이트 함수
-  const [preview, setPreview] = useState(user.image); // 현재 프로필 이미지 미리보기
-  const [imageSrc, setImageSrc] = useState(null); // 자르기 모달에 전달할 이미지 소스
-  const fileInputRef = useRef(); // 숨겨진 input 요소를 제어하기 위한 ref
+  const { user, setUser } = useUser();
+  const [preview, setPreview] = useState(user?.image);
+  const [imageSrc, setImageSrc] = useState(null);
+  const fileInputRef = useRef();
+  const { success, error: showError } = useToast();
 
-  // 이미지 선택 시 실행되는 함수
   const handleImageChange = async (e) => {
-    const file = e.target.files[0]; // 첫 번째 파일만 사용
+    const file = e.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
-    // 파일 로딩 완료 시 base64 데이터로 모달 열기
     reader.onloadend = () => {
       setImageSrc(reader.result);
     };
     reader.readAsDataURL(file);
   };
 
-  // 자르기 완료 후 이미지 저장 및 미리보기 반영
   const handleCropComplete = async (croppedImage) => {
-    const res = await fetch(`http://localhost:3001/users/${user.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image: croppedImage }),
-    });
-
-    if (res.ok) {
-      const updatedUser = { ...user, image: croppedImage };
-      localStorage.setItem("user", JSON.stringify(updatedUser)); // 로컬 저장소에 업데이트
-      setUser(updatedUser); // context 상태도 업데이트
-      setPreview(croppedImage); // 새로운 이미지로 미리보기 갱신
-    } else {
-      alert("이미지 저장 실패");
+    try {
+      await apiPatch("user", user.id, { image: croppedImage });
+      const newUser = { ...user, image: croppedImage };
+      localStorage.setItem("user", JSON.stringify(newUser));
+      setUser(newUser);
+      setPreview(croppedImage);
+      success("프로필 이미지가 변경되었습니다.");
+    } catch (err) {
+      showError(err.message || "이미지 저장 실패");
     }
   };
 

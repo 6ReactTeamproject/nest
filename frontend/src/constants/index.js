@@ -1,25 +1,33 @@
-export const API_BASE_URL = "http://localhost:3001"; 
-// API 호출 시 기본 URL
+export const API_BASE_URL = "http://localhost:3000";
 
-export const VALID_IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif"]; 
-// 허용되는 이미지 파일 타입
+// 페이지네이션 설정
+export const POSTS_PER_PAGE = 5;
 
-export const ROUTES = {
-  HOME: "/",        // 홈 페이지 경로
-  TEAM: "/team",    // 팀 페이지 경로
-  INTRO: "/intro",  // 여행지 소개 페이지 경로
-  LOGIN: "/login",  // 로그인 페이지 경로
-  SIGNUP: "/signup",// 회원가입 페이지 경로
-  BOARD: "/board",  // 게시판 목록 페이지 경로
-  POST: "/post",    // 게시글 작성/수정 페이지 경로
-};
-
+// 메시지 상수
 export const MESSAGES = {
-  REQUIRED_FIELD: "필수 항목을 입력해주세요.",         // 필수 입력 경고 메시지
-  CREATE_SUCCESS: "게시글이 생성되었습니다.",         // 게시글 생성 성공 메시지
-  CREATE_FAIL: "게시글 생성에 실패했습니다.",          // 게시글 생성 실패 메시지
-  UPDATE_SUCCESS: "수정이 완료되었습니다.",           // 게시글 수정 성공 메시지
-  UPDATE_FAIL: "수정에 실패했습니다.",                // 게시글 수정 실패 메시지
-  DELETE_CONFIRM: "삭제할까요?",                      // 삭제 확인 메시지
-  LOGIN_REQUIRED: "댓글을 작성하려면 로그인하세요.",   // 로그인 필요 메시지
+  REQUIRED_FIELD: "필수 항목을 입력해주세요.",
+  CREATE_SUCCESS: "게시글이 생성되었습니다.",
+  CREATE_FAIL: "게시글 생성에 실패했습니다.",
+  UPDATE_SUCCESS: "수정이 완료되었습니다.",
+  UPDATE_FAIL: "수정에 실패했습니다.",
+  DELETE_CONFIRM: "삭제할까요?",
+  LOGIN_REQUIRED: "댓글을 작성하려면 로그인하세요.",
+  LOGIN_NEEDED: "로그인이 필요합니다.",
+  LOGIN_FAIL: "로그인에 실패했습니다.",
+  SIGNUP_SUCCESS: "회원가입이 완료되었습니다.",
+  SIGNUP_FAIL: "회원가입에 실패했습니다.",
+  PASSWORD_CHANGE_SUCCESS: "비밀번호가 변경되었습니다.",
+  PASSWORD_CHANGE_FAIL: "비밀번호 변경에 실패했습니다.",
+  NAME_CHANGE_SUCCESS: "닉네임이 변경되었습니다.",
+  NAME_CHANGE_FAIL: "닉네임 변경에 실패했습니다.",
+  COMMENT_CREATE_SUCCESS: "댓글이 작성되었습니다.",
+  COMMENT_CREATE_FAIL: "댓글 작성에 실패했습니다.",
+  COMMENT_UPDATE_SUCCESS: "댓글이 수정되었습니다.",
+  COMMENT_UPDATE_FAIL: "댓글 수정에 실패했습니다.",
+  COMMENT_DELETE_SUCCESS: "댓글이 삭제되었습니다.",
+  COMMENT_DELETE_FAIL: "댓글 삭제에 실패했습니다.",
+  MESSAGE_SEND_SUCCESS: "쪽지가 전송되었습니다.",
+  MESSAGE_SEND_FAIL: "쪽지 전송에 실패했습니다.",
+  LOADING: "로딩 중...",
+  NO_DATA: "데이터가 없습니다.",
 };

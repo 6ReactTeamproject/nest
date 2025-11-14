@@ -1,12 +1,12 @@
-// 댓글 수정/삭제 버튼 컴포넌트
+import { compareIds } from "../../utils/helpers";
+
 const CommentActions = ({
-  comment,      // 댓글 데이터
-  currentUser,  // 현재 로그인한 사용자 객체
-  onEdit,       // 수정 버튼
-  onDelete,     // 삭제 버튼
+  comment,
+  currentUser,
+  onEdit,
+  onDelete,
 }) => {
-  // 로그인하지 않았거나, 댓글 작성자가 아니면 버튼들을 보여주지 않음
-  if (!currentUser || String(currentUser.id) !== String(comment.userId))
+  if (!currentUser || !compareIds(currentUser.id, comment.userId))
     return null;
 
   return (

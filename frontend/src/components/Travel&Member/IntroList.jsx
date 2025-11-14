@@ -22,7 +22,11 @@ export default function IntroList({
 
   useEffect(() => {
     apiGet(endpoint)
-      .then((data) => setItems(data))
+      .then((res) => {
+        // 응답이 { message, data } 형식이면 data 사용, 아니면 직접 사용
+        const items = res.data ?? res;
+        setItems(Array.isArray(items) ? items : []);
+      })
       .catch((err) => console.error("데이터 불러오기 실패:", err));
   }, [endpoint]);
 

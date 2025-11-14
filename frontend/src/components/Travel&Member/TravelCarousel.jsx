@@ -6,15 +6,22 @@ import "../../styles/travel.css";
 
 export default function TravelCarousel() {
   const [items, setItems] = useState([]); // 여행지 데이터 저장 상태
+  const [isLoading, setIsLoading] = useState(true); // 로딩 상태
   const navigate = useNavigate();
 
   useEffect(() => {
+    setIsLoading(true);
     apiGet("semester/info")
-      .then((data) => {
-        console.log("불러온 travel data:", data);
-        setItems(data); // 받아온 데이터를 상태에 저장
+      .then((res) => {
+        // 응답이 { message, data } 형식이면 data 사용, 아니면 직접 사용
+        const data = res.data ?? res;
+        setItems(Array.isArray(data) ? data : []);
+        setIsLoading(false);
       })
-      .catch((err) => console.error("데이터 불러오기 실패:", err));
+      .catch((err) => {
+        console.error("데이터 불러오기 실패:", err);
+        setIsLoading(false);
+      });
   }, []);
 
   // react-slick 슬라이더 설정
@@ -28,8 +35,11 @@ export default function TravelCarousel() {
     autoplaySpeed: 4000, // 자동 재생 간격
   };
 
-  // 데이터 없거나 로딩 중일 때 보여줄 메시지
-  if (!items.length) return <p>로딩 중 혹은 데이터 없음</p>;
+  // 로딩 중일 때는 아무것도 표시하지 않음
+  if (isLoading) return null;
+  
+  // 데이터가 실제로 없을 때만 메시지 표시
+  if (!items.length) return null;
 
   return (
     <div className="carousel-container">

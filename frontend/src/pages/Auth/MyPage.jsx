@@ -1,48 +1,62 @@
 import React, { useEffect, useState } from "react";
 import { useUser } from "../../hooks/UserContext";
+import { useToast } from "../../components/common/Toast";
+import { apiGet } from "../../api/fetch";
+import { compareIds } from "../../utils/helpers";
 import UploadImg from "./UploadImg";
 import GitForm from "./GitForm";
 import MypageLayout from "./MypageLayout";
 import { Link } from "react-router-dom";
 
 export default function MyPage() {
-  const { user } = useUser(); // 현재 로그인된 사용자 정보 가져오기
-  const [myPosts, setMyPosts] = useState([]); // 내가 작성한 게시판 글 상태
-  const [myMembers, setMyMembers] = useState([]); // 내가 작성한 멤버 소개 상태
-  const [myTravels, setMyTravels] = useState([]); // 내가 작성한 여행 소개 상태
+  const { user } = useUser();
+  const [myPosts, setMyPosts] = useState([]);
+  const [myMembers, setMyMembers] = useState([]);
+  const [myTravels, setMyTravels] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { error: showError } = useToast();
 
   useEffect(() => {
-    if (!user) return; // 로그인하지 않았을 경우 API 요청 생략
+    const loadData = async () => {
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
 
-    // 게시판 글 중 내 userId와 일치하는 글만 필터링
-    fetch("http://localhost:3001/posts")
-      .then(res => res.json())
-      .then(data => {
-        const filtered = data.filter(item => String(item.userId) === String(user.id));
-        setMyPosts(filtered);
-      });
+      try {
+        const [postsData, membersData, travelsData] = await Promise.all([
+          apiGet("posts/all", `?userId=${user.id}`),
+          apiGet("members"),
+          apiGet("semester/all"),
+        ]);
 
-    // 멤버 소개 중 authorId가 내 ID인 항목만 필터링
-    fetch("http://localhost:3001/members")
-      .then(res => res.json())
-      .then(data => {
-        const filtered = data.filter(item => String(item.authorId) === String(user.id));
-        setMyMembers(filtered);
-      });
+        setMyPosts(Array.isArray(postsData) ? postsData : []);
 
-    // 여행 소개(semester) 중 authorId가 내 ID인 항목만 필터링
-    fetch("http://localhost:3001/semester")
-      .then(res => res.json())
-      .then(data => {
-        const filtered = Array.isArray(data)
-          ? data.filter(item => String(item.authorId) === String(user.id))
+        const filteredMembers = membersData.filter(item => {
+          const memberUserId = item.user_id || item.user?.id;
+          return compareIds(memberUserId, user.id);
+        });
+        setMyMembers(filteredMembers);
+
+        const filteredTravels = Array.isArray(travelsData)
+          ? travelsData.filter(item => {
+              const authorId = item.authorId || item.author?.id;
+              return compareIds(authorId, user.id);
+            })
           : [];
-        setMyTravels(filtered);
-      });
+        setMyTravels(filteredTravels);
+      } catch (err) {
+        showError("데이터를 불러오는데 실패했습니다.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
   }, [user]);
 
-  // 로그인되지 않았을 경우 접근 차단
   if (!user) return <p>로그인이 필요합니다.</p>;
+  if (isLoading) return <p>로딩 중...</p>;
 
   return (
     <MypageLayout>
@@ -53,7 +67,6 @@ export default function MyPage() {
         <div className="profile-info">
           <h3>{user.name}</h3>
           <p>아이디 : {user.loginId}</p>
-          <p>등급 : {user.grade}</p>
           <GitForm /> {/* 깃허브 주소 입력/수정 */}
         </div>
       </div>

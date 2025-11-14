@@ -5,7 +5,7 @@ export default function TravelIntro() {
   return (
     <IntroList
       heading="현지학기제 소개"
-      endpoint="semester"
+      endpoint="semester/info"
       primaryKey="title"
       secondaryKey="description"
       imageKey="imageUrl"

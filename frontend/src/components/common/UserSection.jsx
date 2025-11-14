@@ -33,6 +33,7 @@ export function UserSection() {
   // 로그아웃 처리 함수
   const handleLogout = () => {
     localStorage.removeItem("user");
+    localStorage.removeItem("access_token"); // JWT 토큰도 삭제
     setUser(null);
     nav("/login"); // 로그인 페이지로 이동
   };

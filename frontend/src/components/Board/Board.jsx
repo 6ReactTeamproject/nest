@@ -7,7 +7,9 @@ import { apiGet } from "../../api/fetch";
 import { filterPosts } from "../../utils/search";
 import { getPaginatedItems, getTotalPages } from "../../utils/pagination";
 import { useUser } from "../../hooks/UserContext";
+import { useToast } from "../common/Toast";
 import HandleAuth from "../common/HandleAuth";
+import { POSTS_PER_PAGE, MESSAGES } from "../../constants";
 import "../../styles/board.css";
 
 const Board = () => {
@@ -19,9 +21,10 @@ const Board = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [members, setMembers] = useState([]);
   const [users, setUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const { user } = useUser();
-  const postsPerPage = 5;
+  const { error: showError } = useToast();
 
   const currentPage = parseInt(searchParams.get("page")) || 1;
   const sortType = searchParams.get("sort") || "";
@@ -42,19 +45,30 @@ const Board = () => {
     setSearchParams(newSearchParams);
   };
 
-  // ✅ 데이터 불러오기
+  // 데이터 불러오기 (async/await로 변경, reverse 제거)
   useEffect(() => {
-    apiGet("posts/info")
-      .then((res) => setPosts([...res.data].reverse()))
-      .catch((err) => console.error("posts 에러:", err));
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        const [postsRes, membersRes, usersRes] = await Promise.all([
+          apiGet("posts/info"),
+          apiGet("members/info"),
+          apiGet("user/info"),
+        ]);
 
-    apiGet("members/info")
-      .then((res) => setMembers(res.data ?? res))
-      .catch((err) => console.error("members 에러:", err));
+        // reverse() 제거 - 백엔드에서 이미 DESC로 정렬됨
+        const postsData = postsRes.data ?? postsRes;
+        setPosts(Array.isArray(postsData) ? postsData : []);
+        setMembers(membersRes.data ?? membersRes);
+        setUsers(usersRes.data ?? usersRes);
+      } catch (err) {
+        showError("데이터를 불러오는데 실패했습니다.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    apiGet("users/info")
-      .then((res) => setUsers(res.data ?? res))
-      .catch((err) => console.error("users 에러:", err));
+    loadData();
   }, []);
 
   // 검색어 변경
@@ -93,8 +107,12 @@ const Board = () => {
   });
 
   const displayPosts = isSearching ? filtered : posts;
-  const currentPosts = getPaginatedItems(sortedPosts, currentPage, postsPerPage);
-  const totalPages = getTotalPages(displayPosts, postsPerPage);
+  const currentPosts = getPaginatedItems(sortedPosts, currentPage, POSTS_PER_PAGE);
+  const totalPages = getTotalPages(displayPosts, POSTS_PER_PAGE);
+
+  if (isLoading) {
+    return <div className="board-container">{MESSAGES.LOADING}</div>;
+  }
 
   return (
     <div className="board-container">

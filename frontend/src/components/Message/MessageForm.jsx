@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { apiPost, apiGet } from "../../api/fetch";
 import { useUser } from "../../hooks/UserContext";
+import { useToast } from "../common/Toast";
+import { compareIds } from "../../utils/helpers";
+import { MESSAGES } from "../../constants";
 
 const MessageForm = ({ onClose }) => {
   const { user } = useUser();
@@ -9,51 +12,51 @@ const MessageForm = ({ onClose }) => {
     receiverId: "",
     title: "",
     content: "",
-    senderId: user.id,
-    createdAt: new Date().toISOString(),
-    isRead: false,
   });
+  const { success, error: showError } = useToast();
 
-  // 사용자 목록 가져오기
   useEffect(() => {
-    apiGet("users/info")
-      .then((data) => setUsers(data))
-      .catch((err) => console.error("사용자 목록 로딩 실패:", err));
+    const loadUsers = async () => {
+      try {
+        const res = await apiGet("user/info");
+        const usersList = res.data ?? res;
+        setUsers(Array.isArray(usersList) ? usersList : []);
+      } catch (err) {
+        showError("사용자 목록을 불러오는데 실패했습니다.");
+      }
+    };
+    loadUsers();
   }, []);
 
-  // 폼 입력값 변경 처리
   const handleChange = (e) => {
     setMessage({ ...message, [e.target.name]: e.target.value });
   };
 
-  // 쪽지 전송 처리
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 새 메시지 객체 생성
-    const newMessage = {
-      senderId: user.id, // 현재 사용자
-      receiverId: message.receiverId, // 선택된 받는 사람
-      title: message.title,
-      content: message.content,
-      createdAt: new Date().toISOString(), // 전송 시간
-      isRead: false, // 새 메시지는 읽지 않은 상태
-    };
+    if (!message.receiverId || !message.title.trim() || !message.content.trim()) {
+      showError("모든 필드를 입력해주세요.");
+      return;
+    }
 
     try {
+      const newMessage = {
+        receiverId: message.receiverId,
+        title: message.title,
+        content: message.content,
+      };
+
       await apiPost("messages", newMessage);
-      // 전송 후 초기화
       setMessage({
         receiverId: "",
         title: "",
         content: "",
-        senderId: user.id,
-        createdAt: new Date().toISOString(),
-        isRead: false,
       });
+      success(MESSAGES.MESSAGE_SEND_SUCCESS);
       onClose();
-    } catch (error) {
-      console.error("쪽지 전송 실패:", error);
+    } catch (err) {
+      showError(err.message || MESSAGES.MESSAGE_SEND_FAIL);
     }
   };
 
@@ -71,7 +74,7 @@ const MessageForm = ({ onClose }) => {
           <option value="">받는 사람 선택</option>
           {/* 본인을 제외한 사용자 목록 옵션 생성 */}
           {users
-            .filter((u) => u.id !== user?.id)
+            .filter((u) => !compareIds(u.id, user?.id))
             .map((u) => (
               <option key={u.id} value={u.id}>
                 {u.name}
@@ -103,9 +106,6 @@ const MessageForm = ({ onClose }) => {
                 receiverId: "",
                 title: "",
                 content: "",
-                senderId: user.id,
-                createdAt: new Date().toISOString(),
-                isRead: false,
               });
               onClose();
             }}

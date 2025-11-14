@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { useUser } from "../../hooks/UserContext";
 import { apiGet, apiPost } from "../../api/fetch";
+import { useToast } from "../common/Toast";
+import { findUserById, formatDate } from "../../utils/helpers";
+import { MESSAGES } from "../../constants";
 import "./Message.css";
 
 const MessageDetail = ({ message, onClose, onMessageSent }) => {
@@ -9,57 +12,47 @@ const MessageDetail = ({ message, onClose, onMessageSent }) => {
   const [receiver, setReceiver] = useState(null);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyData, setReplyData] = useState({ title: "", content: "" });
+  const { success, error: showError } = useToast();
 
-  // 보낸 사람과 받는 사람 정보 가져오기
   useEffect(() => {
-    apiGet("users").then((users) => {
-      const foundSender = users.find(
-        (u) => String(u.id) === String(message.senderId)
-      );
-      const foundReceiver = users.find(
-        (u) => String(u.id) === String(message.receiverId)
-      );
-      setSender(foundSender);
-      setReceiver(foundReceiver);
-    });
+    const loadUsers = async () => {
+      try {
+        const users = await apiGet("user/all");
+        setSender(findUserById(users, message.senderId));
+        setReceiver(findUserById(users, message.receiverId));
+      } catch (err) {
+        showError("사용자 정보를 불러오는데 실패했습니다.");
+      }
+    };
+    loadUsers();
   }, [message]);
 
-  // 답장 전송 처리
   const handleReplySubmit = async (e) => {
     e.preventDefault();
 
-    // 제목과 내용 검증
     if (!replyData.title.trim() || !replyData.content.trim()) {
-      alert("제목과 내용을 모두 입력해주세요.");
+      showError("제목과 내용을 모두 입력해주세요.");
       return;
     }
 
     try {
-      // 새 메시지 객체 생성
       const newMessage = {
         title: replyData.title,
         content: replyData.content,
-        senderId: user.id,
         receiverId: message.senderId,
-        createdAt: new Date().toISOString(),
-        isRead: false,
       };
 
       await apiPost("messages", newMessage);
-
-      // 답장 폼 초기화
       setReplyData({ title: "", content: "" });
       setShowReplyForm(false);
 
-      // 부모 컴포넌트에 메시지 전송 완료 알림
       if (onMessageSent) {
         onMessageSent();
       }
 
-      alert("답장이 전송되었습니다.");
-    } catch (error) {
-      console.error("답장 전송 실패:", error);
-      alert("답장 전송에 실패했습니다.");
+      success(MESSAGES.MESSAGE_SEND_SUCCESS);
+    } catch (err) {
+      showError(err.message || MESSAGES.MESSAGE_SEND_FAIL);
     }
   };
 
@@ -84,7 +77,7 @@ const MessageDetail = ({ message, onClose, onMessageSent }) => {
           <div className="message-meta">
             <span className="label">보낸 시간:</span>
             <span className="value">
-              {new Date(message.createdAt).toLocaleString()}
+              {formatDate(message.createdAt)}
             </span>
           </div>
         </div>
@@ -99,7 +92,7 @@ const MessageDetail = ({ message, onClose, onMessageSent }) => {
 
       <div className="message-detail-footer">
         {/* 받은 쪽지인 경우에만 답장 버튼 표시 */}
-        {message.senderId !== user.id && !showReplyForm && (
+        {message.senderId !== user?.id && !showReplyForm && (
           <button
             className="reply-button"
             onClick={() => setShowReplyForm(true)}

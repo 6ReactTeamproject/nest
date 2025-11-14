@@ -1,5 +1,6 @@
 import { useState, Children, cloneElement } from "react";
 import { apiPatch } from "../../api/fetch";
+import { useToast } from "../common/Toast";
 import FormButton from "../common/FormButton";
 import { MESSAGES } from "../../constants";
 import "../../styles/form.css";
@@ -11,8 +12,8 @@ export default function EditForm({
   data,
   onDone
 }) {
-    // 초기 데이터를 상태로 관리
   const [editValues, setEditValues] = useState({ ...data });
+  const { success, error: showError } = useToast();
 
   const enhancedChildren = Children.map(children, (child) => {
     if (!child?.props?.name) {
@@ -28,22 +29,18 @@ export default function EditForm({
     });
   });
 
-  // 저장 버튼 클릭 시
   const handleUpdate = async () => {
-    // 빈 필드가 있으면 알림
     if (!empty(editValues)) {
-      alert(MESSAGES.REQUIRED_FIELD);
+      showError(MESSAGES.REQUIRED_FIELD);
       return;
     }
 
     try {
       await apiPatch(endpoint, data.id, editValues);
-      alert(MESSAGES.UPDATE_SUCCESS);
-      // 완료 콜백 호출
+      success(MESSAGES.UPDATE_SUCCESS);
       onDone(editValues);
     } catch (err) {
-      alert(MESSAGES.UPDATE_FAIL);
-      console.error(err);
+      showError(err.message || MESSAGES.UPDATE_FAIL);
     }
   };
 

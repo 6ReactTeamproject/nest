@@ -1,58 +1,71 @@
 import { useUser } from "../../hooks/UserContext";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import PostHeader from "./PostHeader";
 import PostActions from "./PostActions";
 import CommentList from "../Comment/CommentList";
 import CommentForm from "../Comment/CommentForm";
 import { apiGet, apiPatch } from "../../api/fetch";
+import { useToast } from "../common/Toast";
+import { findUserById, formatDate } from "../../utils/helpers";
+import { MESSAGES } from "../../constants";
 import "../../styles/post.css";
 
 // 게시글 상세 페이지 컴포넌트
 function PostDetail() {
-  const { user: currentUser } = useUser(); // 현재 로그인 사용자 정보
-  const { id } = useParams(); // URL 파라미터에서 게시글 ID 가져오기
+  const { user: currentUser } = useUser();
+  const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const [post, setPost] = useState(null); // 게시글 데이터 상태
-  const [postUser, setPostUser] = useState(null); // 게시글 작성자 정보
-  const [comments, setComments] = useState([]); // 댓글 목록 상태
-  const [users, setUsers] = useState([]); // 사용자 목록 상태
+  const { error: showError } = useToast();
+  
+  const [post, setPost] = useState(null);
+  const [postUser, setPostUser] = useState(null);
+  const [comments, setComments] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // 사용자 목록 한번만 불러오기
+  // 데이터 로딩 (useEffect 병합)
   useEffect(() => {
-    apiGet("users").then((data) => setUsers(data));
-  }, []);
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        
+        // 사용자 목록과 게시글, 댓글을 병렬로 로드
+        const [usersData, postData, commentsData] = await Promise.all([
+          apiGet("user/all"),
+          apiGet("posts", id),
+          apiGet("comments", `?postId=${id}`),
+        ]);
 
-  // 게시글과 댓글 불러오기 및 조회수 증가 처리
-    useEffect(() => {
-      // 게시글 정보 조회
-      apiGet("posts", id).then((data) => {
-        setPost(data);
-        // 조회수 1 증가
-        apiPatch("posts", id, { views: (data.views || 0) + 1 });
-      });
-
-      // 해당 게시글 댓글 목록 조회
-      apiGet("comments", `?postId=${id}`).then((data) => {
-        // 댓글에 기본 값들 보정
-        const enriched = data.map((c) => ({
+        setUsers(usersData);
+        setPost(postData);
+        
+        // 댓글 데이터 보정
+        const enriched = commentsData.map((c) => ({
           ...c,
           createdAt: c.createdAt || new Date().toISOString(),
           likes: c.likes || 0,
           likedUserIds: Array.isArray(c.likedUserIds) ? c.likedUserIds : [],
-      }));
-      setComments(enriched);
-    });
-  }, [id]);
+        }));
+        setComments(enriched);
 
-  // 게시글 작성자 정보 찾기
-  useEffect(() => {
-    if (post && users.length > 0) {
-      const user = users.find((u) => String(u.id) === String(post.userId));
-      setPostUser(user);
-    }
-  }, [post, users]);
+        // 조회수 증가 (에러는 무시)
+        apiPatch("posts", `${id}/view`, {}).catch(() => {});
+
+        // 작성자 정보 찾기
+        if (postData && usersData.length > 0) {
+          const user = findUserById(usersData, postData.userId);
+          setPostUser(user);
+        }
+      } catch (err) {
+        showError(MESSAGES.LOADING + " " + err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [id]);
 
   // 게시판으로 돌아가는 함수
   const handleBackToBoard = () => {
@@ -69,7 +82,8 @@ function PostDetail() {
     }
   };
 
-  if (!post) return <div>Loading...</div>;
+  if (isLoading) return <div>{MESSAGES.LOADING}</div>;
+  if (!post) return <div>{MESSAGES.NO_DATA}</div>;
 
   return (
     <div className="post-detail-wrapper">
@@ -86,7 +100,7 @@ function PostDetail() {
             <span>
               작성자: {postUser?.name || post.authorName || post.authorId}
             </span>
-            <span>{new Date(post.createdAt).toLocaleString()}</span>
+            <span>{formatDate(post.createdAt)}</span>
             <span>조회수: {post.views}</span>
           </div>
         </div>
@@ -105,10 +119,8 @@ function PostDetail() {
         {/* 게시글 수정/삭제 버튼 및 동작 */}
         <PostActions
           post={post}
-          postUser={postUser}
           currentUser={currentUser}
           id={id}
-          navigate={navigate}
         />
       </div>
       {/* 댓글 섹션 */}

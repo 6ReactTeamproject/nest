@@ -4,7 +4,7 @@ export default function TeamIntro() {
   return (
     <IntroList
       heading="조원 소개"
-      endpoint="members"
+      endpoint="members/info"
       primaryKey="name"
       secondaryKey="introduction"
       imageKey="imageUrl"

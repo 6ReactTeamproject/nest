@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { API_BASE_URL } from "../../constants";
+import { useToast } from "../../components/common/Toast";
+import { API_BASE_URL, MESSAGES } from "../../constants";
 import "../../styles/Signup.css"
 
-const API_URL = `${API_BASE_URL}/users`;
+const API_URL = `${API_BASE_URL}/auth`;
 
 export function Signup() {
   // 사용자 입력 상태
@@ -11,14 +12,14 @@ export function Signup() {
   const [userId, setUserId] = useState("");
   const [passwd, setPassword] = useState("");
 
-  // 아이디 중복 확인 관련 상태
   const [idCheckMsg, setIdCheckMsg] = useState("");
   const [idCheckColor, setIdCheckColor] = useState("black");
   const [isIdChecked, setIsIdChecked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // 기본 이미지를 URL에 있는 이미지로
   const defaultImageURL = "https://i.ibb.co/Fz1bk4g/default-profile.png";
   const navigate = useNavigate();
+  const { success, error: showError } = useToast();
 
   // 이름, 아이디, 비밀번호 형식을 검사하기 위한 정규식 정의
   const nameRegex = /^[가-힣a-zA-Z]+$/;
@@ -47,13 +48,12 @@ export function Signup() {
     }
 
     try {
-      // 서버에 입력한 아이디가 이미 존재하는지 json에 확인 요청
-      const res = await fetch(`${API_URL}?loginId=${userId}`);
-      // 응답받은 사용자 목록(json)을 자바스크립트 객체로 변환
-      const users = await res.json();
+      // 서버에 입력한 아이디가 이미 존재하는지 확인 요청
+      const res = await fetch(`${API_URL}/check-id?loginId=${userId}`);
+      const data = await res.json();
 
       // 응답 결과에 따라 사용 가능 여부를 판단
-      if (users.length > 0) {
+      if (data.exists) {
         setIdCheckMsg("이미 존재하는 아이디입니다.");
         setIdCheckColor("red");
         setIsIdChecked(false);
@@ -70,35 +70,32 @@ export function Signup() {
     }
   };
 
-  // 회원가입 처리 함수 (폼 제출 시 실행)
   const handleSignup = async () => {
-    // 사용자가 입력하지 않은 항목이 있을 경우 경고
     if (!name || !userId || !passwd) {
-      alert("모든 항목을 입력하세요.");
+      showError("모든 항목을 입력하세요.");
       return;
     }
 
-    // 각 필드의 유효성 검사 결과가 false일 경우 경고 표시
     if (!isNameValid) {
-      alert("이름 형식이 올바르지 않습니다.");
+      showError("이름 형식이 올바르지 않습니다.");
       return;
     }
     if (!isUserIdValid) {
-      alert("아이디 형식이 올바르지 않습니다.");
+      showError("아이디 형식이 올바르지 않습니다.");
       return;
     }
     if (!isPasswordValid) {
-      alert("비밀번호에 한글을 포함할 수 없습니다.");
+      showError("비밀번호에 한글을 포함할 수 없습니다.");
       return;
     }
     if (!isIdChecked) {
-      alert("아이디 중복확인 필수");
+      showError("아이디 중복확인 필수");
       return;
     }
 
     try {
-      // 서버에 사용자 정보를 전송하여 회원가입 요청 수행
-      const postRes = await fetch(API_URL, {
+      setIsLoading(true);
+      const postRes = await fetch(`${API_URL}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -106,25 +103,32 @@ export function Signup() {
           loginId: userId,
           password: passwd,
           image: defaultImageURL,
-          grade: "일반회원",
           giturl: "",
         }),
       });
 
-      if (postRes.ok) {
-        alert("회원가입 성공!");
-        setName("");
-        setUserId("");
-        setPassword("");
-        setIdCheckMsg("");
-        setIsIdChecked(false);
-        navigate("/login"); // 로그인 페이지로 이동
-      } else {
-        alert("회원가입 실패! 서버 오류");
+      if (!postRes.ok) {
+        const error = await postRes.json();
+        showError(error.message || MESSAGES.SIGNUP_FAIL);
+        return;
       }
+
+      const data = await postRes.json();
+      localStorage.setItem("access_token", data.access_token);
+      localStorage.setItem("refresh_token", data.refresh_token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      success(MESSAGES.SIGNUP_SUCCESS);
+      setName("");
+      setUserId("");
+      setPassword("");
+      setIdCheckMsg("");
+      setIsIdChecked(false);
+      navigate("/login");
     } catch (err) {
-      console.error("에러 발생:", err);
-      alert("서버와의 통신 중 문제가 발생했습니다.");
+      showError(err.message || "서버와의 통신 중 문제가 발생했습니다.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -178,7 +182,9 @@ export function Signup() {
         )}
 
         {/* 회원가입 버튼 */}
-        <button onClick={handleSignup}>회원가입</button>
+        <button onClick={handleSignup} disabled={isLoading}>
+          {isLoading ? MESSAGES.LOADING : "회원가입"}
+        </button>
       </div>
     </div>
   );
