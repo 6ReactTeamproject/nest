@@ -4,8 +4,9 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  Index,
+  CreateDateColumn,
 } from 'typeorm';
-// [수정됨] 임포트 경로 수정 (users.entity -> user.entity)
 import { User } from './user.entity';
 
 @Entity({ name: 'semester' })
@@ -13,10 +14,13 @@ export class Semester {
   @PrimaryGeneratedColumn()
   id: number;
 
-  // [수정됨] user.semesters를 참조
-  @ManyToOne(() => User, (user) => user.semesters)
+  @ManyToOne(() => User, (user) => user.semesters, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'authorId' })
+  @Index()
   author: User;
+
+  @Column()
+  authorId: number;
 
   @Column()
   title: string;
@@ -24,6 +28,9 @@ export class Semester {
   @Column('text')
   description: string;
 
-  @Column()
+  @Column({ nullable: true })
   imageUrl: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
 }

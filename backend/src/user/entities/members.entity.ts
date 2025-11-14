@@ -4,6 +4,7 @@ import {
   Column,
   OneToOne,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { User } from './user.entity';
 
@@ -14,7 +15,11 @@ export class Member {
 
   @OneToOne(() => User, (user) => user.memberProfile, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
+  @Index()
   user: User;
+
+  @Column({ name: 'user_id' })
+  user_id: number;
 
   @Column()
   name: string;

@@ -4,6 +4,7 @@ import {
   Column,
   OneToMany,
   OneToOne,
+  Index,
 } from 'typeorm';
 import { Post } from './posts.entity';
 import { Comment } from './comments.entity';
@@ -16,7 +17,8 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
+  @Index()
   loginId: string;
 
   @Column()
@@ -34,7 +36,6 @@ export class User {
   @OneToMany(() => Post, (posts) => posts.user)
   posts: Post[];
 
-  // [수정됨] 인자 이름을 'comments' -> 'comment'로 변경
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
 
@@ -47,7 +48,6 @@ export class User {
   @OneToMany(() => Semester, (semester) => semester.author)
   semesters: Semester[];
 
-  // [수정됨] Member 엔티티의 'author'가 아닌 'user' 속성을 참조
   @OneToOne(() => Member, (member) => member.user)
   memberProfile: Member;
 }

@@ -4,6 +4,8 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  Index,
+  CreateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 
@@ -12,17 +14,19 @@ export class Message {
   @PrimaryGeneratedColumn()
   id: number;
 
-  // [수정] user.sentMessages를 참조
-  @ManyToOne(() => User, (user) => user.sentMessages)
+  @ManyToOne(() => User, (user) => user.sentMessages, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'senderId' })
+  @Index()
   sender: User;
 
   @Column()
   senderId: number;
 
-  // [수정] user.receivedMessages를 참조
-  @ManyToOne(() => User, (user) => user.receivedMessages)
+  @ManyToOne(() => User, (user) => user.receivedMessages, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'receiverId' })
+  @Index()
   receiver: User;
 
   @Column()
@@ -34,7 +38,7 @@ export class Message {
   @Column('text')
   content: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn()
   createdAt: Date;
 
   @Column({ default: false })

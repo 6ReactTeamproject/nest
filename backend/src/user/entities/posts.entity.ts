@@ -5,6 +5,8 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  Index,
+  CreateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 import { Comment } from './comments.entity';
@@ -20,14 +22,15 @@ export class Post {
   @Column('text')
   content: string;
 
-  @ManyToOne(() => User, (user) => user.posts)
+  @ManyToOne(() => User, (user) => user.posts, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
+  @Index()
   user: User;
 
   @Column()
   userId: number;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn()
   createdAt: Date;
 
   @Column({ default: 0 })
@@ -36,6 +39,6 @@ export class Post {
   @Column({ nullable: true })
   image: string;
 
-  @OneToMany(() => Comment, (comment) => comment.post)
+  @OneToMany(() => Comment, (comment) => comment.post, { cascade: true })
   comments: Comment[];
 }

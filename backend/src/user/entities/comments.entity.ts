@@ -5,6 +5,8 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  Index,
+  CreateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 import { Post } from './posts.entity';
@@ -17,33 +19,37 @@ export class Comment {
   @Column('text')
   text: string;
 
-  @ManyToOne(() => Post, (post) => post.comments)
+  @ManyToOne(() => Post, (post) => post.comments, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'postId' })
+  @Index()
   post: Post;
 
   @Column()
   postId: number;
 
-  @ManyToOne(() => User, (user) => user.comments)
+  @ManyToOne(() => User, (user) => user.comments, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
+  @Index()
   user: User;
 
   @Column()
   userId: number;
 
-  // parent comment
-  @ManyToOne(() => Comment, (comment) => comment.children, { nullable: true })
+  @ManyToOne(() => Comment, (comment) => comment.children, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'parentId' })
   parent: Comment;
 
   @Column({ nullable: true })
+  @Index()
   parentId: number;
 
-  // child comments
   @OneToMany(() => Comment, (comment) => comment.parent)
   children: Comment[];
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn()
   createdAt: Date;
 
   @Column({ default: 0 })
