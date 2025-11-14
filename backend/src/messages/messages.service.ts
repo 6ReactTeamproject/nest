@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Message } from 'src/user/entities/messages.entity';
@@ -15,43 +15,35 @@ export class MessageService {
     return await this.messageRepository.find();
   }
 
-  // 단일 메시지 조회
-  async getOne(id: number): Promise<Message> {
-    const message = await this.messageRepository.findOne({ where: { id } });
-    if (!message) throw new NotFoundException('Message not found');
-    return message;
-  }
-
   // 메시지 생성
   async create(data: Partial<Message>): Promise<Message> {
     const message = this.messageRepository.create(data);
     return await this.messageRepository.save(message);
   }
 
-  // 메시지 수정 (예: 읽음 처리 등)
-  async update(id: number, data: Partial<Message>): Promise<Message> {
+  // 메시지 수정 (예: 읽음 처리 등, 본인 메시지만)
+  async update(
+    id: number,
+    data: Partial<Message>,
+    userId: number,
+  ): Promise<Message> {
+    const message = await this.messageRepository.findOne({ where: { id } });
+    if (!message) throw new NotFoundException('Message not found');
+    // 발신자나 수신자만 수정 가능
+    if (message.senderId !== userId && message.receiverId !== userId) {
+      throw new ForbiddenException('본인의 메시지만 수정할 수 있습니다.');
+    }
     await this.messageRepository.update(id, data);
+    // 업데이트 후 업데이트된 메시지 반환
     return this.getOne(id);
   }
 
-  // 메시지 삭제
-  async remove(id: number): Promise<void> {
-    await this.messageRepository.delete(id);
-  }
-
-  // 특정 유저가 받은 메시지 조회
-  async getReceivedMessages(receiverId: number): Promise<Message[]> {
-    return await this.messageRepository.find({ where: { receiverId } });
-  }
-
-  // 특정 유저가 보낸 메시지 조회
-  async getSentMessages(senderId: number): Promise<Message[]> {
-    return await this.messageRepository.find({ where: { senderId } });
-  }
-
-  async ww(): Promise<Partial<Message>[]> {
-    return await this.messageRepository.find({
-      select: ['id', 'title', 'content', 'createdAt'],
-    });
+  // 단일 메시지 조회 (내부 사용)
+  private async getOne(id: number): Promise<Message> {
+    const message = await this.messageRepository.findOne({ where: { id } });
+    if (!message) {
+      throw new NotFoundException('Message not found');
+    }
+    return message;
   }
 }

@@ -7,41 +7,47 @@ import {
   Param,
   Body,
   Query,
+  UseGuards,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { PostsService } from './posts.service';
 import { Post as PostEntity } from 'src/user/entities/posts.entity';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { GetUser } from '../auth/decorators/get-user.decorator';
+import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 
+@ApiTags('게시글')
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   // 모든 게시글
   @Get('all')
-  async getAll(): Promise<PostEntity[]> {
+  async getAll(@Query('userId') userId?: number): Promise<PostEntity[]> {
+    if (userId) {
+      return await this.postsService.getByUserId(Number(userId));
+    }
     return await this.postsService.getAll();
   }
 
   // 게시글 정보 (프론트에서 주로 사용하는 기본 fetch용)
   @Get('info')
   async getInfo() {
-    const result = await this.postsService.rr(); // postsService 내부 함수 이름 rr 유지
+    const result = await this.postsService.getBasicInfo();
     return {
       message: 'Posts의 기본',
       data: result,
     };
   }
 
-  // 검색
-  @Get('search')
-  async search(@Query('keyword') keyword: string) {
-    if (!keyword || keyword.trim() === '') {
-      return { message: '검색어를 입력하세요.' };
-    }
-    const posts = await this.postsService.search(keyword);
-    return {
-      message: '검색 결과입니다.',
-      data: posts,
-    };
+  // 조회수 증가 (인증 불필요)
+  @ApiOperation({ summary: '게시글 조회수 증가' })
+  @ApiResponse({ status: 200, description: '조회수 증가 성공' })
+  @Patch(':id/view')
+  async incrementViews(@Param('id') id: number): Promise<{ message: string }> {
+    await this.postsService.incrementViews(id);
+    return { message: 'Views incremented' };
   }
 
   // 단일 게시글
@@ -50,25 +56,41 @@ export class PostsController {
     return await this.postsService.getOne(id);
   }
 
-  // 게시글 작성
+  @ApiOperation({ summary: '게시글 작성' })
+  @ApiBearerAuth('JWT-auth')
+  @ApiResponse({ status: 201, description: '게시글 작성 성공' })
+  @ApiResponse({ status: 401, description: '인증 필요' })
+  @UseGuards(JwtAuthGuard)
   @PostMethod()
-  async create(@Body() data: Partial<PostEntity>): Promise<PostEntity> {
-    return await this.postsService.create(data);
+  async create(
+    @Body() createPostDto: CreatePostDto,
+    @GetUser() user: { userId: number; loginId: string },
+  ): Promise<PostEntity> {
+    return await this.postsService.create({ ...createPostDto, userId: user.userId });
   }
 
-  // 게시글 수정
+  @ApiOperation({ summary: '게시글 수정' })
+  @ApiBearerAuth('JWT-auth')
+  @ApiResponse({ status: 200, description: '게시글 수정 성공' })
+  @ApiResponse({ status: 403, description: '본인의 글만 수정 가능' })
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async update(
     @Param('id') id: number,
-    @Body() data: Partial<PostEntity>,
+    @Body() updatePostDto: UpdatePostDto,
+    @GetUser() user: { userId: number; loginId: string },
   ): Promise<PostEntity> {
-    return await this.postsService.update(id, data);
+    return await this.postsService.update(id, updatePostDto, user.userId);
   }
 
-  // 게시글 삭제
+  @ApiOperation({ summary: '게시글 삭제' })
+  @ApiBearerAuth('JWT-auth')
+  @ApiResponse({ status: 200, description: '게시글 삭제 성공' })
+  @ApiResponse({ status: 403, description: '본인의 글만 삭제 가능' })
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async remove(@Param('id') id: number) {
-    await this.postsService.remove(id);
+  async remove(@Param('id') id: number, @GetUser() user: { userId: number; loginId: string }) {
+    await this.postsService.remove(id, user.userId);
     return { message: `Post with id ${id} deleted.` };
   }
 }

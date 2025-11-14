@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 
 @Injectable()
@@ -15,10 +16,10 @@ export class UserService {
     return await this.userRepository.find();
   }
 
-  async tt(): Promise<Partial<User>[]> {
+  // 사용자 기본 정보 조회
+  async getBasicInfo(): Promise<Partial<User>[]> {
     return await this.userRepository.find({
       select: ['id', 'name', 'giturl', 'image'],
-      // order: 정렬순서 내림차순
       order: { id: 'ASC' },
     });
   }
@@ -30,20 +31,26 @@ export class UserService {
     return user;
   }
 
-  // 생성
-  async create(data: Partial<User>): Promise<User> {
-    const user = this.userRepository.create(data);
-    return await this.userRepository.save(user);
-  }
-
   // 수정
-  async update(id: number, data: Partial<User>): Promise<User> {
-    await this.userRepository.update(id, data);
+  async update(id: number, data: Partial<User> & { currentPassword?: string }): Promise<User> {
+    const user = await this.getOne(id);
+    
+    // 비밀번호 변경 시 현재 비밀번호 검증 필수
+    if (data.password) {
+      if (!data.currentPassword) {
+        throw new BadRequestException('현재 비밀번호를 입력해주세요.');
+      }
+      const isPasswordValid = await bcrypt.compare(data.currentPassword, user.password);
+      if (!isPasswordValid) {
+        throw new BadRequestException('현재 비밀번호가 올바르지 않습니다.');
+      }
+      // 새 비밀번호 해싱
+      data.password = await bcrypt.hash(data.password, 10);
+    }
+    
+    // currentPassword는 DB에 저장하지 않으므로 제거
+    const { currentPassword, ...updateData } = data;
+    await this.userRepository.update(id, updateData);
     return this.getOne(id);
-  }
-
-  // 삭제
-  async remove(id: number): Promise<void> {
-    await this.userRepository.delete(id);
   }
 }

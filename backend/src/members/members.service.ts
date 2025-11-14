@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Member } from 'src/user/entities/members.entity';
 import { Repository } from 'typeorm';
@@ -10,14 +10,15 @@ export class MembersService {
     private readonly memberRepository: Repository<Member>,
   ) {}
 
-  // 모든 멤버 조회 (✅ 'relations' 제거)
+  // 모든 멤버 조회
   async findAll(): Promise<Member[]> {
-    // 'user' 정보가 JOIN되지 않습니다.
-    return this.memberRepository.find();
+    return this.memberRepository.find({
+      relations: ['user'], // user 관계 포함
+    });
   }
 
-  // ee 함수 (QueryBuilder 사용 - 원래대로)
-  async ee(): Promise<Partial<Member>[]> {
+  // 멤버 기본 정보 조회
+  async getBasicInfo(): Promise<Partial<Member>[]> {
     return await this.memberRepository
       .createQueryBuilder('member')
       .select([
@@ -25,16 +26,15 @@ export class MembersService {
         'member.name',
         'member.imageUrl',
         'member.introduction',
-        'member.authorId',
+        'member.user_id',
       ])
       .getMany();
   }
 
-  // 특정 멤버 조회 (✅ 'relations' 제거)
+  // 특정 멤버 조회
   async findOne(id: number): Promise<Member> {
     const member = await this.memberRepository.findOne({
       where: { id: id },
-      // 'relations: ['user']'가 없으므로 'member.user'는 undefined가 됩니다.
     });
 
     if (!member) {
@@ -43,8 +43,7 @@ export class MembersService {
     return member;
   }
 
-  // 멤버 생성 (save 사용 - 원래대로)
-  // 'user' 관계를 '쓰는' 작업이므로 코드는 동일합니다.
+  // 멤버 생성
   async create(data: {
     userId: number;
     name: string;
@@ -55,14 +54,14 @@ export class MembersService {
       name: data.name,
       introduction: data.introduction,
       imageUrl: data.imageUrl,
-      user: { id: data.userId }, // 👈 관계 쓰기
+      user: { id: data.userId },
     });
 
     try {
       return await this.memberRepository.save(newMember);
     } catch (error: any) {
       if (error.code === 'ER_DUP_ENTRY') {
-        throw new NotFoundException(
+        throw new ConflictException(
           `User ID ${data.userId}는 이미 Member를 가지고 있습니다.`,
         );
       }
@@ -70,16 +69,22 @@ export class MembersService {
     }
   }
 
-  // 멤버 수정 (save 사용 - 원래대로)
-  // 'update'는 'findOne'을 호출합니다.
-  // 이 findOne은 'user' 정보를 가져오지 않지만,
-  // 'updateData'로 'user' 관계를 수정하는 것은 여전히 가능합니다.
-  async update(id: number, updateData: Partial<Member>): Promise<Member> {
-    // 1. 여기서 'user' 정보가 빠진 'existingMember'를 가져옵니다.
-    const existingMember = await this.findOne(id);
-
-    // 2. 만약 updateData에 { user: { id: 2 } }가 있다면
-    //    'user' 정보가 없던 existingMember에 새 'user' 관계가 합쳐집니다.
+  // 멤버 수정 (본인만)
+  async update(
+    id: number,
+    updateData: Partial<Member>,
+    userId: number,
+  ): Promise<Member> {
+    const existingMember = await this.memberRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
+    if (!existingMember) {
+      throw new NotFoundException(`Member with id ${id} not found`);
+    }
+    if (existingMember.user.id !== userId) {
+      throw new ForbiddenException('본인의 정보만 수정할 수 있습니다.');
+    }
     const updatedMember = this.memberRepository.merge(
       existingMember,
       updateData,
@@ -89,7 +94,7 @@ export class MembersService {
       return await this.memberRepository.save(updatedMember);
     } catch (error: any) {
       if (error.code === 'ER_DUP_ENTRY') {
-        throw new NotFoundException(
+        throw new ConflictException(
           `수정하려는 정보(User ID)가 이미 다른 Member에 의해 사용 중입니다.`,
         );
       }
@@ -97,8 +102,18 @@ export class MembersService {
     }
   }
 
-  // 멤버 삭제 (delete 사용 - 원래대로)
-  async remove(id: number): Promise<void> {
+  // 멤버 삭제 (본인만)
+  async remove(id: number, userId: number): Promise<void> {
+    const existingMember = await this.memberRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
+    if (!existingMember) {
+      throw new NotFoundException(`Member with id ${id} not found`);
+    }
+    if (existingMember.user.id !== userId) {
+      throw new ForbiddenException('본인의 정보만 삭제할 수 있습니다.');
+    }
     const deleteResult = await this.memberRepository.delete(id);
 
     if (deleteResult.affected === 0) {

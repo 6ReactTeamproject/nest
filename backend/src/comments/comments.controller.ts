@@ -7,62 +7,68 @@ import {
   Patch,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { CommentsService } from './comments.service';
 import { Comment } from 'src/user/entities/comments.entity';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { GetUser } from '../auth/decorators/get-user.decorator';
+import { CreateCommentDto } from './dto/create-comment.dto';
+import { UpdateCommentDto } from './dto/update-comment.dto';
 
+@ApiTags('댓글')
 @Controller('comments')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
-  @Get('search')
-  async search(@Query('keyword') keyword: string) {
-    if (!keyword || keyword.trim() === '') {
-      return { message: '검색어를 입력하세요.' };
+  // postId로 댓글 조회
+  @Get()
+  async getByPostId(@Query('postId') postId: number): Promise<Comment[]> {
+    if (!postId) {
+      return [];
     }
-    const comments = await this.commentsService.search(keyword);
-    return {
-      message: '잘됨',
-      data: comments,
-    };
+    return await this.commentsService.getByPostId(Number(postId));
   }
 
-  @Get('all')
-  async getAll(): Promise<Comment[]> {
-    return await this.commentsService.getAll();
-  }
-
-  @Get('info')
-  // 이름 바꿔야함
-  async qq() {
-    const result = await this.commentsService.qq();
-    return {
-      message: 'Comments의 기본',
-      data: result,
-    };
-  }
-
-  @Get(':id')
-  async getOne(@Param('id') id: number): Promise<Comment> {
-    return await this.commentsService.getOne(id);
-  }
-
+  @ApiOperation({ summary: '댓글 작성' })
+  @ApiBearerAuth('JWT-auth')
+  @ApiResponse({ status: 201, description: '댓글 작성 성공' })
+  @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() data: Partial<Comment>): Promise<Comment> {
-    return await this.commentsService.create(data);
+  async create(
+    @Body() createCommentDto: CreateCommentDto,
+    @GetUser() user: { userId: number; loginId: string },
+  ): Promise<Comment> {
+    return await this.commentsService.create({ ...createCommentDto, userId: user.userId });
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async update(
     @Param('id') id: number,
-    @Body() data: Partial<Comment>,
+    @Body() updateCommentDto: UpdateCommentDto,
+    @GetUser() user: { userId: number; loginId: string },
   ): Promise<Comment> {
-    return await this.commentsService.update(id, data);
+    return await this.commentsService.update(id, updateCommentDto, user.userId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async remove(@Param('id') id: number) {
-    await this.commentsService.remove(id);
+  async remove(@Param('id') id: number, @GetUser() user: { userId: number; loginId: string }) {
+    await this.commentsService.remove(id, user.userId);
     return { message: `Comment with id ${id} deleted.` };
+  }
+
+  @ApiOperation({ summary: '댓글 좋아요 토글' })
+  @ApiBearerAuth('JWT-auth')
+  @ApiResponse({ status: 200, description: '좋아요 토글 성공' })
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/like')
+  async toggleLike(
+    @Param('id') id: number,
+    @GetUser() user: { userId: number; loginId: string },
+  ): Promise<Comment> {
+    return await this.commentsService.toggleLike(id, user.userId);
   }
 }

@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Post } from 'src/user/entities/posts.entity';
 
 @Injectable()
@@ -17,10 +17,10 @@ export class PostsService {
     });
   }
 
-  async rr(): Promise<Partial<Post>[]> {
+  // 게시글 기본 정보 조회
+  async getBasicInfo(): Promise<Partial<Post>[]> {
     return await this.postRepository.find({
-      select: ['id', 'title', 'content', 'createdAt', 'views'],
-      // 내림차순
+      select: ['id', 'title', 'content', 'createdAt', 'views', 'userId'],
       order: { createdAt: 'DESC' },
     });
   }
@@ -38,21 +38,36 @@ export class PostsService {
     return await this.postRepository.save(post);
   }
 
-  // 수정
-  async update(id: number, data: Partial<Post>): Promise<Post> {
+  // 수정 (본인 글만)
+  async update(id: number, data: Partial<Post>, userId: number): Promise<Post> {
+    const post = await this.getOne(id);
+    if (post.userId !== userId) {
+      throw new ForbiddenException('본인의 글만 수정할 수 있습니다.');
+    }
     await this.postRepository.update(id, data);
     return this.getOne(id);
   }
 
-  // 삭제
-  async remove(id: number): Promise<void> {
+  // 삭제 (본인 글만)
+  async remove(id: number, userId: number): Promise<void> {
+    const post = await this.getOne(id);
+    if (post.userId !== userId) {
+      throw new ForbiddenException('본인의 글만 삭제할 수 있습니다.');
+    }
     await this.postRepository.delete(id);
   }
 
-  // 제목 검색 기능 (옵션)
-  async search(keyword: string): Promise<Post[]> {
+  // 조회수 증가 (인증 불필요)
+  async incrementViews(id: number): Promise<void> {
+    await this.postRepository.increment({ id }, 'views', 1);
+  }
+
+  // userId로 게시글 조회 (마이페이지 필터링용)
+  async getByUserId(userId: number): Promise<Post[]> {
     return await this.postRepository.find({
-      where: { title: Like(`%${keyword}%`) },
+      where: { userId },
+      order: { createdAt: 'DESC' },
     });
   }
+
 }
