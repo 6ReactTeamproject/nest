@@ -17,7 +17,6 @@ export function Signup() {
   const [isIdChecked, setIsIdChecked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const defaultImageURL = "https://i.ibb.co/Fz1bk4g/default-profile.png";
   const navigate = useNavigate();
   const { success, error: showError } = useToast();
 
@@ -102,8 +101,7 @@ export function Signup() {
           name,
           loginId: userId,
           password: passwd,
-          image: defaultImageURL,
-          giturl: "",
+          // image는 백엔드에서 디폴트 이미지로 자동 설정됨
         }),
       });
 

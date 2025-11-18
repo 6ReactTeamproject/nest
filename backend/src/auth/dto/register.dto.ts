@@ -15,8 +15,6 @@ import {
   MinLength,
   MaxLength,
   Matches,
-  IsOptional,
-  IsUrl,
 } from 'class-validator';
 
 export class RegisterDto {
@@ -59,20 +57,9 @@ export class RegisterDto {
   })
   name: string;
 
-  // 프로필 이미지 URL 필드 (선택적)
-  // 왜 선택적인가? 이미지가 없는 사용자도 가입할 수 있어야 하므로
-  // 왜 URL 검증이 필요한가? 잘못된 URL 형식을 방지하여 데이터베이스 오류 방지
-  @IsOptional()
-  @IsString({ message: '이미지는 문자열이어야 합니다.' })
-  @IsUrl({}, { message: '올바른 URL 형식이 아닙니다.' })
-  image?: string;
-
-  // Git URL 필드 (선택적)
-  // 왜 선택적인가? Git URL이 없는 사용자도 가입할 수 있어야 하므로
-  // 왜 URL 검증이 필요한가? 잘못된 URL 형식을 방지하여 데이터베이스 오류 방지
-  @IsOptional()
-  @IsString({ message: '깃허브 URL은 문자열이어야 합니다.' })
-  @IsUrl({}, { message: '올바른 URL 형식이 아닙니다.' })
-  giturl?: string;
+  // 주의: image와 giturl은 RegisterDto에 포함하지 않음
+  // 왜 제외하나?
+  // - image: 회원가입 시 항상 디폴트 이미지를 사용하며, 나중에 사용자 정보 수정에서 변경 가능
+  // - giturl: 회원가입 시에는 입력하지 않고, 나중에 사용자 정보 수정에서만 추가
 }
 

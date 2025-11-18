@@ -284,12 +284,20 @@ export class AuthService {
     // salt rounds 10: 해싱 강도 (높을수록 안전하지만 느림, 10은 적절한 균형)
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
 
+    // 디폴트 프로필 이미지 URL
+    // 왜 디폴트 이미지를 사용하나? 회원가입 시 이미지를 선택하지 않으므로 기본 이미지 설정
+    const defaultImageURL = 'https://i.ibb.co/Fz1bk4g/default-profile.png';
+
     // 사용자 엔티티 생성: 메모리상 객체 생성 (아직 DB에 저장 안 됨)
-    // 스프레드 연산자: registerDto의 모든 속성을 복사
     // password: 해시된 비밀번호로 교체
+    // image: 디폴트 이미지로 설정 (회원가입 시 이미지 선택 불가)
+    // giturl: 필드를 생략하면 TypeORM이 nullable 필드를 자동으로 null로 설정
     const user = this.userRepository.create({
-      ...registerDto,
+      loginId: registerDto.loginId,
       password: hashedPassword, // 해시된 비밀번호로 저장
+      name: registerDto.name,
+      image: defaultImageURL, // 디폴트 이미지 설정
+      // giturl은 생략: nullable 필드이므로 자동으로 null로 저장됨
     });
 
     // 사용자 저장: 데이터베이스에 실제로 저장
