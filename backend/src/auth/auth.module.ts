@@ -19,7 +19,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       useFactory: (configService: ConfigService): JwtModuleOptions => ({
         secret: configService.get<string>('JWT_SECRET') || 'your-secret-key-change-in-production',
         signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRES_IN') || '15m', // 액세스 토큰: 15분
+          expiresIn: (configService.get<string>('JWT_EXPIRES_IN') || '15m') as string, // 액세스 토큰: 15분
         },
       }),
       inject: [ConfigService],

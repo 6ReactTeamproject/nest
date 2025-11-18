@@ -43,7 +43,7 @@ export class AuthService {
    * @param password 사용자 비밀번호 (평문)
    * @returns 인증 성공 시 사용자 정보 (비밀번호 제외), 실패 시 null
    */
-  async validateUser(loginId: string, password: string): Promise<User | null> {
+  async validateUser(loginId: string, password: string): Promise<Omit<User, 'password'> | null> {
     // 아이디로 사용자 조회: 해당 아이디를 가진 사용자가 있는지 확인
     const user = await this.userRepository.findOne({
       where: { loginId },
