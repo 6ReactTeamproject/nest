@@ -3,6 +3,7 @@ import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { SignOptions } from 'jsonwebtoken';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { User } from '../user/entities/user.entity';
@@ -16,12 +17,15 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     ConfigModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService): JwtModuleOptions => ({
-        secret: configService.get<string>('JWT_SECRET') || 'your-secret-key-change-in-production',
-        signOptions: {
-          expiresIn: (configService.get<string>('JWT_EXPIRES_IN') || '15m') as string, // 액세스 토큰: 15분
-        },
-      }),
+      useFactory: (configService: ConfigService): JwtModuleOptions => {
+        const expiresIn = configService.get<string>('JWT_EXPIRES_IN') || '15m'; // 액세스 토큰: 15분
+        return {
+          secret: configService.get<string>('JWT_SECRET') || 'your-secret-key-change-in-production',
+          signOptions: {
+            expiresIn: expiresIn as SignOptions['expiresIn'], // jsonwebtoken의 SignOptions 타입 사용
+          } as SignOptions,
+        };
+      },
       inject: [ConfigService],
     }),
   ],
