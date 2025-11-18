@@ -29,10 +29,9 @@ export class RefreshToken {
 
   // 리프레시 토큰 문자열
   // unique: true - 중복 방지 (같은 토큰이 여러 번 저장되지 않도록)
-  // @Index() - 토큰으로 조회하는 경우가 많으므로 인덱스 생성
+  // unique: true는 자동으로 UNIQUE INDEX를 생성하므로 @Index()는 불필요
   // 왜 인덱스가 필요한가? 토큰 검증 시 빠른 조회를 위해
   @Column({ unique: true })
-  @Index()
   token: string;
 
   // ManyToOne 관계: 여러 리프레시 토큰은 한 사용자에 속함

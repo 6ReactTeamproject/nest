@@ -33,10 +33,9 @@ export class User {
 
   // 로그인 ID: 사용자가 로그인할 때 사용하는 고유한 식별자
   // unique: true - 중복 방지 (같은 아이디로 여러 계정 생성 불가)
-  // @Index() - 인덱스 생성으로 조회 성능 향상
+  // unique: true는 자동으로 UNIQUE INDEX를 생성하므로 @Index()는 불필요
   // 왜 인덱스가 필요한가? 로그인 시 아이디로 조회하는 경우가 많으므로
   @Column({ unique: true })
-  @Index()
   loginId: string;
 
   // 비밀번호: 해시된 비밀번호 저장

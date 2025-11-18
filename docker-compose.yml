@@ -27,7 +27,8 @@
         - ./backend:/app
       working_dir: /app
       depends_on:
-        - db
+        db:
+          condition: service_healthy
       environment:
         # JWT 설정
         JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
@@ -58,6 +59,13 @@
         # MySQL 데이터를 영구적으로 저장하기 위해 db_data 볼륨 사용
         - ./mysql/init:/docker-entrypoint-initdb.d
         - db_data:/var/lib/mysql
+      healthcheck:
+        # MySQL이 실제로 연결을 받을 수 있을 때까지 대기
+        test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+        interval: 5s
+        timeout: 3s
+        retries: 10
+        start_period: 10s
 
   # --- 볼륨 정의 ---
   volumes:

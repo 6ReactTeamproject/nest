@@ -18,9 +18,8 @@ CREATE TABLE IF NOT EXISTS users (
     loginId VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
-    image VARCHAR(255),
-    giturl VARCHAR(255),
-    INDEX idx_loginId (loginId)
+    image VARCHAR(255) NULL,
+    giturl VARCHAR(255) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Member table
@@ -29,7 +28,7 @@ CREATE TABLE IF NOT EXISTS members (
     user_id INT UNIQUE NOT NULL,
     name VARCHAR(255) NOT NULL,
     introduction TEXT NOT NULL,
-    imageUrl VARCHAR(255),
+    imageUrl VARCHAR(255) NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_user_id (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -40,7 +39,7 @@ CREATE TABLE IF NOT EXISTS semester (
     authorId INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
-    imageUrl VARCHAR(255),
+    imageUrl VARCHAR(255) NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (authorId) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_authorId (authorId)
@@ -54,7 +53,7 @@ CREATE TABLE IF NOT EXISTS posts (
     userId INT NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     views INT DEFAULT 0,
-    image VARCHAR(255),
+    image VARCHAR(255) NULL,
     FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_userId (userId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -68,7 +67,7 @@ CREATE TABLE IF NOT EXISTS comments (
     parentId INT DEFAULT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     likes INT DEFAULT 0,
-    likedUserIds TEXT,
+    likedUserIds TEXT NULL,
     FOREIGN KEY (postId) REFERENCES posts(id) ON DELETE CASCADE,
     FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (parentId) REFERENCES comments(id) ON DELETE CASCADE,
@@ -92,12 +91,23 @@ CREATE TABLE IF NOT EXISTS messages (
     INDEX idx_receiverId (receiverId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Refresh tokens table
+CREATE TABLE IF NOT EXISTS refresh_tokens (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    userId INT NOT NULL,
+    expiresAt DATETIME NOT NULL,
+    createdAt DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_userId (userId)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ======================================
 -- INSERT DATA
 -- ======================================
 
 -- Users (password는 bcrypt 해시: 1111, 2222, 2222, 4444, 5555)
-INSERT INTO users (id, loginId, password, name, image, giturl) VALUES
+INSERT IGNORE INTO users (id, loginId, password, name, image, giturl) VALUES
 (1, 'heejun', '$2b$10$0zuFPcx/adkBizbuSeW0dudYyjifbe0J3kdjMyp4.baOIl5PQMgBK', '강희준', NULL, 'https://github.com/Kanghuijun'),
 (2, 'seongmin', '$2b$10$2yXUv5vjJQjBqrXQqG8.G.NKZa6d9VZGcNo.UHMKCkrReKM9gwjvW', '김성민', NULL, 'https://github.com/kimmin042'),
 (3, 'hyukbin', '$2b$10$OVVjzyEcv/40UBunILRZ7uoETZZ05wfghetB96vfsxWsyn0hg2tUy', '권혁빈', NULL, 'https://github.com/HB-KWon'),
@@ -105,7 +115,7 @@ INSERT INTO users (id, loginId, password, name, image, giturl) VALUES
 (5, 'chagnmin', '$2b$10$uQHk1625HRiSDkYQQMLXeeBB8xsOO7et0JOoRM3ulZyOBp3XA1cCq', '이창민', NULL, 'https://github.com/mu4404');
 
 -- Semester
-INSERT INTO semester (id, authorId, title, description, imageUrl, createdAt) VALUES
+INSERT IGNORE INTO semester (id, authorId, title, description, imageUrl, createdAt) VALUES
 (1, 1, '교토 고쇼 (京都御所)', '일본 천황이 거주하던 궁궐로, 일본 전통 건축양식과 궁중 문화를 직접 체험하며 일본어 속의 고어 및 의례 표현을 학습하기에 적합한 장소입니다.', 'https://images.unsplash.com/photo-1714066598304-7dcf3bd32c24?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', '2024-01-15 10:00:00'),
 (2, 2, '에도 도쿄 박물관 (江戸東京博物館)', '에도 시대부터 현대에 이르는 일본의 생활과 도시 발전을 전시한 박물관으로, 일본어 자료 해석과 역사적 용어 학습에 도움이 됩니다.', 'https://media.triple.guide/triple-cms/c_limit,f_auto,h_1024,w_1024/6ee01bda-f840-4589-af23-a0bb4758858d.jpeg', '2024-02-20 11:00:00'),
 (3, 3, '와세다 대학 캠퍼스 (早稲田大学)', '일본 내 인문학 연구로 유명한 명문 대학으로, 일본어 관련 강연이나 전시도 종종 개최되어 학문적 자극을 받을 수 있는 교육적 장소입니다.', 'https://images.unsplash.com/photo-1720238189486-2b090d9a9459?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', '2024-03-10 12:00:00'),
@@ -113,7 +123,7 @@ INSERT INTO semester (id, authorId, title, description, imageUrl, createdAt) VAL
 (5, 5, '오사카 외국어 학원 (大阪外語学院)', '오사카 중심부에 위치한 외국인 대상 일본어 교육 전문 학원으로, 회화 중심 수업으로 다양한 과정이 개설되어 있습니다. 실생활 속 일본어를 익히고, 일본 문화와 지역사회에 자연스럽게 녹아들 수 있도록 돕는 커리큘럼을 제공합니다.', 'https://lh6.googleusercontent.com/proxy/_3QmCl4sfy-aIW5pS_g2miHEG6dfqGqUkgpKVImPwDe9Tpoq5rLUMnuTxQlwsDbFNb1wzvhEIXuK', '2024-05-12 14:00:00');
 
 -- Posts
-INSERT INTO posts (id, title, content, userId, createdAt, views, image) VALUES
+INSERT IGNORE INTO posts (id, title, content, userId, createdAt, views, image) VALUES
 (3, '오사카 어디로 가고싶어요?', '저는 유니버셜 스튜디오 재팬에 가고싶습니다.', 3, '2025-05-10 09:00:00', 8, NULL),
 (4, '저는 건물 좋아해서', '오사카 성이나 이케다 성에 가보고 싶네요', 3, '2025-05-18 10:00:00', 8, NULL),
 (5, '일본 편의점 음식 추천', '편의점 BEST 3!\n1. 세븐일레븐 - 명란 마요 주먹밥\n2. 로손 - 치즈 인 치킨\n3. 패밀리마트 - 푸딩\n -> 이건 꼭 먹어야함 밤마다 먹으면 기분 좋아짐', 3, '2025-03-03 11:00:00', 24, NULL),
@@ -125,7 +135,7 @@ INSERT INTO posts (id, title, content, userId, createdAt, views, image) VALUES
 (11, '바나나 먹으면 나한테 바나나?', '캬캬캬캬컄ㅋ', 2, '2023-04-15 17:00:00', 104, NULL);
 
 -- Comments
-INSERT INTO comments (id, text, postId, userId, parentId, createdAt, likes, likedUserIds) VALUES
+INSERT IGNORE INTO comments (id, text, postId, userId, parentId, createdAt, likes, likedUserIds) VALUES
 (1, 'UFO 야끼소바도 JMT', 5, 1, NULL, '2025-06-20 14:30:42', 4, NULL),
 (2, '푸딩 못 참즤~', 5, 2, NULL, '2025-06-20 14:32:41', 1, NULL),
 (3, '다음에 메론빵도 먹어보세요', 5, 4, NULL, '2025-06-20 14:33:08', 43, NULL),
@@ -137,12 +147,12 @@ INSERT INTO comments (id, text, postId, userId, parentId, createdAt, likes, like
 (16, '이케다 성은 덜 알려졌는데 은근 매력 있죠~', 4, 1, NULL, '2025-06-20 16:00:02', 0, NULL);
 
 -- Messages
-INSERT INTO messages (id, senderId, receiverId, title, content, createdAt, isRead) VALUES
+INSERT IGNORE INTO messages (id, senderId, receiverId, title, content, createdAt, isRead) VALUES
 (1, 1, 2, '안녕하세요', '반가워요!', '2025-06-20 17:00:00', FALSE),
 (2, 2, 1, 'Re: 안녕하세요', '저도 반가워요!', '2025-06-20 17:05:00', FALSE);
 
 -- Members
-INSERT INTO members (id, user_id, name, introduction, imageUrl) VALUES
+INSERT IGNORE INTO members (id, user_id, name, introduction, imageUrl) VALUES
 (1, 1, '강희준', '안녕하세요, 강희준입니다.', NULL),
 (2, 2, '김성민', '안녕하세요, 김성민입니다.', NULL),
 (3, 3, '권혁빈', '안녕하세요, 권혁빈입니다.', NULL),

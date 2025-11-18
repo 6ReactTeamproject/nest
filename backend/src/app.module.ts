@@ -41,13 +41,12 @@ import { ConfigModule } from '@nestjs/config';
       // entities: 엔티티 파일 경로 (자동으로 모든 엔티티 로드)
       // 왜 이렇게 하나? 엔티티를 자동으로 찾아서 로드하기 위해
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      // synchronize: true - 개발 환경에서 스키마 자동 동기화
-      // 왜 필요한가? 엔티티 변경 시 데이터베이스 스키마를 자동으로 업데이트
-      // 주의: 프로덕션에서는 false로 설정하고 마이그레이션 사용해야 함
-      synchronize: true,
+      // synchronize: false - seed.sql에서 테이블을 생성하므로 자동 동기화 비활성화
+      // 왜 false인가? seed.sql이 먼저 실행되어 테이블을 생성하고, TypeORM과 충돌을 방지하기 위해
+      // 주의: 엔티티 변경 시 seed.sql도 함께 수정해야 함
+      synchronize: false,
       extra: {
         charset: 'utf8mb4', // 연결 레벨에서도 문자셋 설정
-        collation: 'utf8mb4_unicode_ci', // 정렬 규칙: 유니코드 대소문자 구분 없이 정렬
         connectionLimit: 10, // 최대 연결 수 제한
       },
       logging: false, // SQL 쿼리 로깅 비활성화 (개발 시 true로 설정 가능)
