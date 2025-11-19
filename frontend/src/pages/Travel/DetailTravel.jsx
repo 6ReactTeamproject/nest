@@ -4,6 +4,7 @@ import { apiGet } from "../../api/fetch";
 import DeleteButton from "../../components/Travel&Member/DeleteButton";
 import EditTravelIntro from "./EditTravelIntro";
 import { useUser } from "../../hooks/UserContext";
+import { compareIds } from "../../utils/helpers";
 import "../../styles/post.css";
 import "../../styles/travel.css";
 
@@ -32,10 +33,7 @@ export default function DetailTravel() {
   const isOwner = user && compareIds(user.id, authorId);
 
   return (
-    <div
-      className="modal-content"
-      style={{ position: "relative" }}
-    >
+    <div className="modal-content" style={{ position: "relative" }}>
       {/* 닫기 버튼 */}
       <button
         className="close-button"
@@ -62,7 +60,7 @@ export default function DetailTravel() {
           travelPlace={travelPlace}
           onDone={(updated) => {
             setTravelPlace(updated); // 수정된 데이터로 갱신
-            setIsEditing(false);     // 수정 모드 종료
+            setIsEditing(false); // 수정 모드 종료
           }}
         />
       ) : (
@@ -82,10 +80,7 @@ export default function DetailTravel() {
           {/* 작성자 본인일 경우만 수정/삭제 버튼 표시 */}
           {isOwner && (
             <div className="button-group">
-              <button
-                onClick={() => setIsEditing(true)}
-                className="add-button"
-              >
+              <button onClick={() => setIsEditing(true)} className="add-button">
                 ✏️ 수정
               </button>
               <DeleteButton

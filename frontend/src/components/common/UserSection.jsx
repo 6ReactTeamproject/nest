@@ -44,7 +44,7 @@ export function UserSection() {
   return (
     <div className="user-section-container">
       {/* 사용자 프로필 이미지가 있는 경우에만 표시 */}
-      {user && (
+      {user && preview && (
         <img src={preview} alt="프로필" className="user-profile-image" />
       )}
       <div className="user-info-container">
@@ -68,14 +68,14 @@ export function UserSection() {
           </>
         ) : (
           <>
-          {/* 비로그인 상태일 때 로그인, 회원가입 버튼 */}
+            {/* 비로그인 상태일 때 로그인, 회원가입 버튼 */}
             <button onClick={() => nav("/login")} className="user-button">
               로그인
             </button>
             <button onClick={() => nav("/signup")} className="user-button">
               회원가입
             </button>
-          </> 
+          </>
         )}
       </div>
     </div>
