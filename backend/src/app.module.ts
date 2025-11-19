@@ -1,7 +1,7 @@
 /**
  * 루트 모듈
  * NestJS 애플리케이션의 루트 모듈로, 모든 기능 모듈을 통합합니다.
- * 
+ *
  * 왜 필요한가?
  * - 모듈 통합: 모든 기능 모듈을 한 곳에서 관리
  * - 전역 설정: 데이터베이스 연결, 환경 변수 등 전역 설정
@@ -18,6 +18,7 @@ import { MembersModule } from './members/members.module';
 import { MessageModule } from './messages/messages.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    
+
     // TypeOrmModule: 데이터베이스 연결 설정
     // forRoot: 루트 레벨에서 데이터베이스 연결 설정
     TypeOrmModule.forRoot({
@@ -51,16 +52,17 @@ import { ConfigModule } from '@nestjs/config';
       },
       logging: false, // SQL 쿼리 로깅 비활성화 (개발 시 true로 설정 가능)
     }),
-    
+
     // 기능 모듈들: 각 기능별 모듈을 import
     // 왜 필요한가? 각 기능을 독립적인 모듈로 분리하여 코드 구조화
-    PostsModule,      // 게시글 모듈
-    UserModule,       // 사용자 모듈
-    SemesterModule,   // 여행지 소개 모듈
-    CommentsModule,   // 댓글 모듈
-    MembersModule,    // 멤버 소개 모듈
-    MessageModule,    // 쪽지 모듈
-    AuthModule,       // 인증 모듈
+    PostsModule, // 게시글 모듈
+    UserModule, // 사용자 모듈
+    SemesterModule, // 여행지 소개 모듈
+    CommentsModule, // 댓글 모듈
+    MembersModule, // 멤버 소개 모듈
+    MessageModule, // 쪽지 모듈
+    AuthModule, // 인증 모듈
+    ChatModule, // 채팅 모듈
   ],
 })
 export class AppModule {}
