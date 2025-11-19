@@ -21,6 +21,7 @@ import { Server, Socket } from 'socket.io';
 import { Logger, UsePipes, ValidationPipe } from '@nestjs/common';
 import { JoinRoomDto } from './dto/join-room.dto';
 import { ChatMessageDto } from './dto/chat-message.dto';
+import { ChatService } from './chat.service';
 
 @WebSocketGateway({
   cors: {
@@ -35,11 +36,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   private readonly logger = new Logger(ChatGateway.name);
-  // 연결된 사용자 정보 저장 (실제로는 JWT에서 가져와야 함)
-  private connectedUsers = new Map<
-    string,
-    { userId: number; username: string }
-  >();
+
+  constructor(private readonly chatService: ChatService) {}
 
   /**
    * 클라이언트 연결 처리
@@ -52,7 +50,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // TODO: JWT 토큰 검증 및 사용자 정보 추출
     // const token = client.handshake.auth?.token;
     // const user = await this.validateToken(token);
-    // this.connectedUsers.set(client.id, user);
+    // this.chatService.addUser(client.id, user);
+    // 임시로 익명 사용자 등록 (실제로는 JWT에서 가져와야 함)
+    this.chatService.addUser(client.id, {
+      userId: 0,
+      username: '익명',
+    });
   }
 
   /**
@@ -63,20 +66,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
    */
   handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
-    const user = this.connectedUsers.get(client.id);
+    const user = this.chatService.getUser(client.id);
     if (user) {
       // 사용자가 속한 모든 방에서 나가기 알림
       const rooms = Array.from(client.rooms);
       rooms.forEach((room) => {
         if (room !== client.id) {
           // 시스템 메시지: 사용자가 나갔음을 알림
-          client.to(room).emit('systemMessage', {
-            message: `${user.username} 님이 나갔습니다.`,
-            time: new Date().toISOString(),
-          });
+          const systemMessage = this.chatService.createSystemMessage(
+            `${user.username} 님이 나갔습니다.`,
+          );
+          client.to(room).emit('systemMessage', systemMessage);
         }
       });
-      this.connectedUsers.delete(client.id);
+      this.chatService.removeUser(client.id);
     }
   }
 
@@ -93,17 +96,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: JoinRoomDto,
   ) {
     try {
-      const user = this.connectedUsers.get(client.id);
+      const user = this.chatService.getUser(client.id);
       const username = user?.username || '익명';
+
+      // 방 입장 검증
+      this.chatService.validateJoinRoom(data.roomId, username);
 
       client.join(data.roomId);
       this.logger.log(`${username} joined room ${data.roomId}`);
 
       // 방에 있는 다른 사용자들에게 입장 알림 (발신자 제외)
-      client.to(data.roomId).emit('systemMessage', {
-        message: `${username} 님이 입장했습니다.`,
-        time: new Date().toISOString(),
-      });
+      const systemMessage = this.chatService.createSystemMessage(
+        `${username} 님이 입장했습니다.`,
+      );
+      client.to(data.roomId).emit('systemMessage', systemMessage);
 
       // 발신자에게는 성공 메시지 전송
       client.emit('joinRoomSuccess', {
@@ -113,7 +119,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     } catch (error) {
       this.logger.error('방 입장 실패:', error);
       client.emit('error', {
-        message: '방 입장에 실패했습니다.',
+        message: error.message || '방 입장에 실패했습니다.',
       });
     }
   }
@@ -131,17 +137,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: JoinRoomDto,
   ) {
     try {
-      const user = this.connectedUsers.get(client.id);
+      const user = this.chatService.getUser(client.id);
       const username = user?.username || '익명';
+
+      // 방 나가기 검증
+      this.chatService.validateLeaveRoom(data.roomId, username);
 
       client.leave(data.roomId);
       this.logger.log(`${username} left room ${data.roomId}`);
 
       // 방에 있는 다른 사용자들에게 나가기 알림
-      client.to(data.roomId).emit('systemMessage', {
-        message: `${username} 님이 나갔습니다.`,
-        time: new Date().toISOString(),
-      });
+      const systemMessage = this.chatService.createSystemMessage(
+        `${username} 님이 나갔습니다.`,
+      );
+      client.to(data.roomId).emit('systemMessage', systemMessage);
 
       // 발신자에게는 성공 메시지 전송
       client.emit('leaveRoomSuccess', {
@@ -151,7 +160,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     } catch (error) {
       this.logger.error('방 나가기 실패:', error);
       client.emit('error', {
-        message: '방 나가기에 실패했습니다.',
+        message: error.message || '방 나가기에 실패했습니다.',
       });
     }
   }
@@ -169,37 +178,21 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: ChatMessageDto,
   ) {
     try {
-      const user = this.connectedUsers.get(client.id);
+      const user = this.chatService.getUser(client.id);
       const username = user?.username || '익명';
 
-      // 메시지 검증
-      if (!data.message || data.message.trim().length === 0) {
-        client.emit('error', {
-          message: '메시지를 입력해주세요.',
-        });
-        return;
-      }
-
-      // 메시지 길이 제한 (예: 1000자)
-      if (data.message.length > 1000) {
-        client.emit('error', {
-          message: '메시지는 1000자 이하여야 합니다.',
-        });
-        return;
-      }
-
-      const payload = {
-        username: username,
-        message: data.message.trim(),
-        time: new Date().toISOString(),
-      };
+      // 메시지 검증 및 처리 (Service에서 처리)
+      const payload = this.chatService.validateAndProcessMessage(
+        data,
+        username,
+      );
 
       // 방에 있는 모든 사용자에게 메시지 전송 (발신자 포함)
       this.server.to(data.roomId).emit('chatMessage', payload);
     } catch (error) {
       this.logger.error('메시지 전송 실패:', error);
       client.emit('error', {
-        message: '메시지 전송에 실패했습니다.',
+        message: error.message || '메시지 전송에 실패했습니다.',
       });
     }
   }
