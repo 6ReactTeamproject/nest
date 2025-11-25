@@ -104,15 +104,13 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
 
 -- Chat rooms table (채팅방 정보)
 CREATE TABLE IF NOT EXISTS chat_rooms (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    roomId VARCHAR(50) NOT NULL UNIQUE,
+    roomId VARCHAR(50) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT NULL,
     createdBy INT NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (createdBy) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_roomId (roomId),
     INDEX idx_createdBy (createdBy)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -202,27 +200,8 @@ INSERT IGNORE INTO members (id, user_id, name, introduction, imageUrl) VALUES
 (5, 5, '이창민', '안녕하세요, 이창민입니다.', NULL);
 
 -- Chat rooms (예시 채팅방)
-INSERT IGNORE INTO chat_rooms (id, roomId, name, description, createdBy, createdAt) VALUES
-(1, 'general', '일반 채팅방', '모든 사용자가 이용할 수 있는 일반 채팅방입니다.', 1, '2025-06-20 10:00:00'),
-(2, 'travel', '여행 정보 채팅방', '여행 정보를 공유하는 채팅방입니다.', 2, '2025-06-20 10:00:00'),
-(3, 'food', '음식 추천 채팅방', '맛집과 음식 추천을 공유하는 채팅방입니다.', 3, '2025-06-20 10:00:00');
+INSERT IGNORE INTO chat_rooms (roomId, name, description, createdBy, createdAt) VALUES
+('general', '일반 채팅방', '모든 사용자가 이용할 수 있는 일반 채팅방입니다.', 1, '2025-06-20 10:00:00'),
+('travel', '여행 정보 채팅방', '여행 정보를 공유하는 채팅방입니다.', 2, '2025-06-20 10:00:00'),
+('food', '음식 추천 채팅방', '맛집과 음식 추천을 공유하는 채팅방입니다.', 3, '2025-06-20 10:00:00');
 
--- Chat room participants (채팅방 참여자 예시)
-INSERT IGNORE INTO chat_room_participants (id, roomId, userId, joinedAt) VALUES
-(1, 'general', 1, '2025-06-20 10:00:00'),
-(2, 'general', 2, '2025-06-20 10:00:00'),
-(3, 'general', 3, '2025-06-20 10:00:00'),
-(4, 'travel', 1, '2025-06-20 10:00:00'),
-(5, 'travel', 4, '2025-06-20 10:00:00'),
-(6, 'food', 2, '2025-06-20 10:00:00'),
-(7, 'food', 3, '2025-06-20 10:00:00'),
-(8, 'food', 5, '2025-06-20 10:00:00');
-
--- Chat messages (예시 채팅 메시지)
-INSERT IGNORE INTO chat_messages (id, roomId, userId, message, createdAt) VALUES
-(1, 'general', 1, '안녕하세요! 모두 환영합니다.', '2025-06-20 10:05:00'),
-(2, 'general', 2, '반가워요!', '2025-06-20 10:06:00'),
-(3, 'travel', 1, '오사카 여행 계획 중인데 추천해주세요!', '2025-06-20 10:10:00'),
-(4, 'travel', 4, '유니버셜 스튜디오 재팬 강추입니다!', '2025-06-20 10:12:00'),
-(5, 'food', 2, '일본 편의점 음식 중에 뭐가 제일 맛있나요?', '2025-06-20 10:15:00'),
-(6, 'food', 3, '우마이봉 진짜 맛있어요!', '2025-06-20 10:16:00');

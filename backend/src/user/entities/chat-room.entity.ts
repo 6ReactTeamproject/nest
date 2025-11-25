@@ -10,7 +10,7 @@
 
 import {
   Entity,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   Column,
   ManyToOne,
   JoinColumn,
@@ -26,14 +26,9 @@ import { ChatRoomParticipant } from './chat-room-participant.entity';
 // Entity 데코레이터: TypeORM이 이 클래스를 데이터베이스 테이블로 인식
 @Entity({ name: 'chat_rooms' })
 export class ChatRoom {
-  // 기본 키: 자동 증가하는 고유 ID
-  @PrimaryGeneratedColumn()
-  id: number;
-
   // 방 ID: 고유한 방 식별자 (예: 'general', 'travel')
-  // unique: true - 중복 방지
-  @Column({ unique: true, length: 50 })
-  @Index()
+  // PRIMARY KEY로 사용 (다른 테이블에서 외래 키로 참조)
+  @PrimaryColumn({ length: 50 })
   roomId: string;
 
   // 방 이름
@@ -42,7 +37,7 @@ export class ChatRoom {
 
   // 방 설명 (선택적)
   @Column('text', { nullable: true })
-  description: string;
+  description: string | null;
 
   // ManyToOne 관계: 여러 채팅방은 한 생성자에 속함
   // onDelete: 'CASCADE' - 생성자가 삭제되면 해당 사용자가 만든 채팅방도 자동 삭제

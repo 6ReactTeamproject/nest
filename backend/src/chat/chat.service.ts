@@ -10,11 +10,22 @@
  */
 
 import { Injectable, BadRequestException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { ChatMessageDto } from './dto/chat-message.dto';
 import { JoinRoomDto } from './dto/join-room.dto';
+import { ChatMessage } from '../user/entities/chat-message.entity';
+import { ChatRoom } from '../user/entities/chat-room.entity';
 
 @Injectable()
 export class ChatService {
+  constructor(
+    @InjectRepository(ChatMessage)
+    private readonly chatMessageRepository: Repository<ChatMessage>,
+    @InjectRepository(ChatRoom)
+    private readonly chatRoomRepository: Repository<ChatRoom>,
+  ) {}
+
   // 연결된 사용자 정보 저장 (socketId -> userInfo)
   private connectedUsers = new Map<
     string,
@@ -158,6 +169,90 @@ export class ChatService {
       message: message,
       time: new Date().toISOString(),
     };
+  }
+
+  /**
+   * 채팅방 생성 또는 조회
+   * 채팅방이 없으면 생성하고, 있으면 조회합니다.
+   * 
+   * @param roomId 방 ID
+   * @param userId 생성자 ID (1:1 채팅방인 경우 첫 번째 사용자)
+   * @returns 채팅방
+   */
+  async getOrCreateRoom(roomId: string, userId: number): Promise<ChatRoom> {
+    let room = await this.chatRoomRepository.findOne({
+      where: { roomId },
+    });
+
+    if (!room) {
+      // 1:1 채팅방인지 확인 (private-로 시작)
+      const isPrivateRoom = roomId.startsWith('private-');
+      
+      // 방 이름 생성
+      let roomName = roomId;
+      if (isPrivateRoom) {
+        // 1:1 채팅방 이름은 "1:1 채팅"으로 설정
+        roomName = '1:1 채팅';
+      }
+
+      // 새 방 생성
+      room = this.chatRoomRepository.create({
+        roomId,
+        name: roomName,
+        description: isPrivateRoom ? '1:1 채팅방' : null,
+        createdBy: userId,
+      });
+      room = await this.chatRoomRepository.save(room);
+    }
+
+    return room;
+  }
+
+  /**
+   * 채팅 메시지 저장
+   * 채팅 메시지를 데이터베이스에 저장합니다.
+   * 
+   * @param roomId 방 ID
+   * @param userId 사용자 ID
+   * @param message 메시지 내용
+   * @returns 저장된 메시지
+   */
+  async saveMessage(
+    roomId: string,
+    userId: number,
+    message: string,
+  ): Promise<ChatMessage> {
+    // 방이 없으면 생성 (반드시 완료될 때까지 대기)
+    const room = await this.getOrCreateRoom(roomId, userId);
+    
+    // 방이 제대로 생성되었는지 확인
+    if (!room) {
+      throw new BadRequestException(`방 생성에 실패했습니다: ${roomId}`);
+    }
+
+    const chatMessage = this.chatMessageRepository.create({
+      roomId,
+      userId,
+      message,
+    });
+    return await this.chatMessageRepository.save(chatMessage);
+  }
+
+  /**
+   * 방의 메시지 조회
+   * 특정 방의 메시지 목록을 가져옵니다.
+   * 
+   * @param roomId 방 ID
+   * @param limit 조회할 메시지 수 (기본값: 100)
+   * @returns 메시지 배열
+   */
+  async getMessages(roomId: string, limit: number = 100): Promise<ChatMessage[]> {
+    return await this.chatMessageRepository.find({
+      where: { roomId },
+      order: { createdAt: 'ASC' },
+      take: limit,
+      relations: ['user'],
+    });
   }
 }
 
