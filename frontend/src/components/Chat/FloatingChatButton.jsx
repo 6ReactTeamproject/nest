@@ -1,0 +1,42 @@
+import { useState, useEffect } from "react";
+import "../../styles/chat.css";
+
+/**
+ * 플로팅 채팅 버튼 컴포넌트
+ * 화면 우측 하단에 고정된 채팅 버튼
+ */
+const FloatingChatButton = ({ isOpen, onToggle, unreadCount = 0 }) => {
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsAnimating(true);
+      const timer = setTimeout(() => setIsAnimating(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  return (
+    <button
+      className={`floating-chat-button ${isOpen ? "open" : ""} ${
+        isAnimating ? "animating" : ""
+      }`}
+      onClick={onToggle}
+      aria-label="채팅 열기/닫기"
+    >
+      {isOpen ? (
+        <span className="chat-icon">✕</span>
+      ) : (
+        <>
+          <span className="chat-icon">💬</span>
+          {unreadCount > 0 && (
+            <span className="unread-badge">{unreadCount}</span>
+          )}
+        </>
+      )}
+    </button>
+  );
+};
+
+export default FloatingChatButton;
+

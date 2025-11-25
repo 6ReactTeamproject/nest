@@ -28,7 +28,8 @@ import { ChatService } from './chat.service';
     origin: 'http://localhost:5173', // CORS 오타 수정: orgin -> origin
     credentials: true,
   },
-  namespace: '/chat', // 네임스페이스 추가 (선택사항)
+  namespace: '/chat', // 네임스페이스 추가
+  transports: ['websocket', 'polling'], // WebSocket과 polling 모두 허용
 })
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true })) // DTO 검증 파이프 추가
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -47,6 +48,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
    */
   handleConnection(client: Socket) {
     this.logger.log(`Client connected: ${client.id}`);
+    this.logger.log(`Connection headers:`, client.handshake.headers);
+    this.logger.log(`Connection auth:`, client.handshake.auth);
+
     // TODO: JWT 토큰 검증 및 사용자 정보 추출
     // const token = client.handshake.auth?.token;
     // const user = await this.validateToken(token);
