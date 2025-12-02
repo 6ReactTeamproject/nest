@@ -17,21 +17,65 @@ const MessageBox = () => {
   const nav = useNavigate();
   const { error: showError } = useToast();
   const hasRedirected = useRef(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
-    if (!user && !hasRedirected.current) {
+    // localStorage에서 토큰 확인
+    const accessToken = localStorage.getItem("access_token");
+    
+    // 토큰이 없으면 즉시 리다이렉트
+    if (!accessToken && !hasRedirected.current) {
       hasRedirected.current = true;
+      setIsCheckingAuth(false);
       showError(MESSAGES.LOGIN_NEEDED);
       nav("/login");
-    } else if (user) {
-      hasRedirected.current = false;
+      return;
     }
-  }, [user, nav]);
+
+    // 토큰이 있으면 사용자 정보가 로드될 때까지 기다림
+    if (accessToken) {
+      // 사용자 정보가 로드되면 인증 확인 완료
+      if (user) {
+        setIsCheckingAuth(false);
+        hasRedirected.current = false;
+      } else {
+        // 사용자 정보가 아직 로드되지 않았으면 잠시 기다림
+        // main.jsx의 useEffect가 실행될 시간을 줌
+        const timer = setTimeout(() => {
+          setIsCheckingAuth(false);
+          // 사용자 정보가 여전히 없으면 리다이렉트
+          if (!user && !hasRedirected.current) {
+            hasRedirected.current = true;
+            showError(MESSAGES.LOGIN_NEEDED);
+            nav("/login");
+          }
+        }, 200); // main.jsx의 useEffect가 실행될 시간을 줌
+        
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [user, nav, showError]);
 
   // 메시지 전송 후 목록 새로고침
   const handleMessageSent = () => {
     setRefreshKey((prev) => prev + 1);
+    // 선택된 메시지도 새로고침 (읽음 상태 업데이트 반영)
+    if (selectedMessage) {
+      // selectedMessage를 null로 설정했다가 다시 설정하여 MessageDetail이 리렌더링되도록 함
+      // 실제로는 MessageList가 다시 로드되면서 selectedMessage도 업데이트됨
+      setSelectedMessage(null);
+    }
   };
+
+  // 인증 확인 중이면 로딩 표시
+  if (isCheckingAuth) {
+    return <div className="message-box">{MESSAGES.LOADING}</div>;
+  }
+
+  // 사용자가 없으면 아무것도 렌더링하지 않음 (리다이렉트 중)
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="message-box">
@@ -81,6 +125,12 @@ const MessageBox = () => {
             onSelectMessage={setSelectedMessage}
             selectedMessage={selectedMessage}
             showForm={showForm}
+            onMessageUpdate={(updatedMessage) => {
+              // 선택된 메시지가 업데이트된 경우 selectedMessage도 업데이트
+              if (selectedMessage && selectedMessage.id === updatedMessage.id) {
+                setSelectedMessage(updatedMessage);
+              }
+            }}
           />
         </div>
 

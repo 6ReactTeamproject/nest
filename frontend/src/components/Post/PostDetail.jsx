@@ -41,12 +41,27 @@ function PostDetail() {
         setPost(postData);
         
         // 댓글 데이터 보정
-        const enriched = commentsData.map((c) => ({
-          ...c,
-          createdAt: c.createdAt || new Date().toISOString(),
-          likes: c.likes || 0,
-          likedUserIds: Array.isArray(c.likedUserIds) ? c.likedUserIds : [],
-        }));
+        const enriched = commentsData.map((c) => {
+          // likedUserIds를 배열로 변환 (문자열일 수 있으므로)
+          let likedUserIds = [];
+          if (Array.isArray(c.likedUserIds)) {
+            likedUserIds = c.likedUserIds.map(id => Number(id)).filter(id => !isNaN(id));
+          } else if (typeof c.likedUserIds === 'string' && c.likedUserIds.trim() !== '') {
+            likedUserIds = c.likedUserIds
+              .split(',')
+              .map(id => id.trim())
+              .filter(id => id !== '')
+              .map(id => Number(id))
+              .filter(id => !isNaN(id));
+          }
+          
+          return {
+            ...c,
+            createdAt: c.createdAt || new Date().toISOString(),
+            likes: c.likes || 0,
+            likedUserIds: likedUserIds,
+          };
+        });
         setComments(enriched);
 
         // 조회수 증가 (에러는 무시)

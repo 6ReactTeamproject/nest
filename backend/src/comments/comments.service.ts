@@ -24,21 +24,53 @@ export class CommentsService {
   ) {}
 
   /**
+   * likedUserIds를 배열로 변환하는 헬퍼 함수
+   * TypeORM의 simple-array 타입이 문자열로 반환될 수 있으므로 배열로 변환
+   * 
+   * @param likedUserIds 문자열 또는 배열 또는 null/undefined
+   * @returns 숫자 배열
+   */
+  private normalizeLikedUserIds(likedUserIds: any): number[] {
+    if (!likedUserIds) return [];
+    if (Array.isArray(likedUserIds)) {
+      // 배열이면 각 요소를 숫자로 변환
+      return likedUserIds.map(id => Number(id)).filter(id => !isNaN(id));
+    }
+    if (typeof likedUserIds === 'string') {
+      // 문자열이면 쉼표로 분리하여 숫자 배열로 변환
+      return likedUserIds
+        .split(',')
+        .map(id => id.trim())
+        .filter(id => id !== '')
+        .map(id => Number(id))
+        .filter(id => !isNaN(id));
+    }
+    return [];
+  }
+
+  /**
    * 게시글 ID로 댓글 조회
    * 특정 게시글에 달린 모든 댓글을 가져옵니다.
    * 
    * 왜 필요한가?
    * - 댓글 목록 표시: 게시글 상세 페이지에서 댓글 목록을 보여주기 위해
    * - 정렬: 생성일시 오름차순으로 정렬하여 최신 댓글이 아래에 표시
+   * - likedUserIds 변환: TypeORM의 simple-array가 문자열로 반환될 수 있으므로 배열로 변환
    * 
    * @param postId 게시글 ID
    * @returns 댓글 배열
    */
   async getByPostId(postId: number): Promise<Comment[]> {
-    return await this.commentsRepository.find({
+    const comments = await this.commentsRepository.find({
       where: { postId },
       order: { createdAt: 'ASC' }, // 오름차순 정렬: 먼저 작성된 댓글이 위에
     });
+    
+    // likedUserIds를 배열로 변환하여 반환
+    return comments.map(comment => ({
+      ...comment,
+      likedUserIds: this.normalizeLikedUserIds(comment.likedUserIds),
+    }));
   }
 
   /**
@@ -141,8 +173,8 @@ export class CommentsService {
       throw new NotFoundException('Comment not found');
     }
 
-    // 좋아요한 사용자 ID 배열 가져오기 (없으면 빈 배열)
-    const likedUserIds = comment.likedUserIds || [];
+    // likedUserIds를 배열로 정규화 (문자열일 수 있으므로)
+    const likedUserIds = this.normalizeLikedUserIds(comment.likedUserIds);
     // 현재 사용자가 이미 좋아요를 눌렀는지 확인
     const isLiked = likedUserIds.includes(userId);
 
@@ -160,6 +192,12 @@ export class CommentsService {
       comment.likedUserIds = [...likedUserIds, userId];
     }
 
-    return await this.commentsRepository.save(comment);
+    const savedComment = await this.commentsRepository.save(comment);
+    
+    // 반환 시에도 배열로 변환하여 반환
+    return {
+      ...savedComment,
+      likedUserIds: this.normalizeLikedUserIds(savedComment.likedUserIds),
+    };
   }
 }

@@ -16,7 +16,9 @@ import {
   IsNumber,
   IsInt,
   Min,
+  IsOptional,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateCommentDto {
   // 댓글 내용 필드
@@ -34,4 +36,13 @@ export class CreateCommentDto {
   // 왜 1 이상인가? 데이터베이스의 기본 키는 1부터 시작하므로
   @Min(1, { message: '게시글 ID는 1 이상이어야 합니다.' })
   postId: number;
+
+  // 부모 댓글 ID 필드 (대댓글인 경우)
+  // 왜 선택적인가? 일반 댓글은 parentId가 null이고, 대댓글만 parentId가 있음
+  @IsOptional()
+  @Transform(({ value }) => (value === null ? undefined : value))
+  @IsNumber({}, { message: '부모 댓글 ID는 숫자여야 합니다.' })
+  @IsInt({ message: '부모 댓글 ID는 정수여야 합니다.' })
+  @Min(1, { message: '부모 댓글 ID는 1 이상이어야 합니다.' })
+  parentId?: number;
 }

@@ -64,10 +64,24 @@ export default function CommentList({
     }
     try {
       const updatedComment = await apiPatch("comments", `${comment.id}/like`, {});
+      
+      // likedUserIds를 배열로 변환 (문자열일 수 있으므로)
+      let likedUserIds = [];
+      if (Array.isArray(updatedComment.likedUserIds)) {
+        likedUserIds = updatedComment.likedUserIds.map(id => Number(id)).filter(id => !isNaN(id));
+      } else if (typeof updatedComment.likedUserIds === 'string' && updatedComment.likedUserIds.trim() !== '') {
+        likedUserIds = updatedComment.likedUserIds
+          .split(',')
+          .map(id => id.trim())
+          .filter(id => id !== '')
+          .map(id => Number(id))
+          .filter(id => !isNaN(id));
+      }
+      
       setComments((prev) =>
         prev.map((c) =>
           c.id === comment.id
-            ? { ...c, likes: updatedComment.likes, likedUserIds: updatedComment.likedUserIds || [] }
+            ? { ...c, likes: updatedComment.likes, likedUserIds: likedUserIds }
             : c
         )
       );

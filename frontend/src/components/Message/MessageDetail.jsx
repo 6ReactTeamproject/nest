@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useUser } from "../../hooks/UserContext";
-import { apiGet, apiPost } from "../../api/fetch";
+import { apiGet, apiPost, apiPatch } from "../../api/fetch";
 import { useToast } from "../common/Toast";
 import { findUserById, formatDate } from "../../utils/helpers";
 import { MESSAGES } from "../../constants";
@@ -14,6 +14,14 @@ const MessageDetail = ({ message, onClose, onMessageSent }) => {
   const [replyData, setReplyData] = useState({ title: "", content: "" });
   const { success, error: showError } = useToast();
 
+  // isRead 값을 boolean으로 변환하는 헬퍼 함수
+  const toBoolean = (value) => {
+    if (value === true || value === 1 || value === "true" || value === "1") {
+      return true;
+    }
+    return false;
+  };
+
   useEffect(() => {
     const loadUsers = async () => {
       try {
@@ -26,6 +34,30 @@ const MessageDetail = ({ message, onClose, onMessageSent }) => {
     };
     loadUsers();
   }, [message]);
+
+  // 메시지 상세보기가 열릴 때 읽음 처리
+  useEffect(() => {
+    const markAsRead = async () => {
+      // 받은 쪽지이고 아직 읽지 않은 경우에만 읽음 처리
+      if (message.receiverId === user?.id && !toBoolean(message.isRead)) {
+        try {
+          console.log("MessageDetail에서 읽음 처리 시작:", message.id);
+          const response = await apiPatch("messages", message.id, { isRead: true });
+          console.log("MessageDetail 백엔드 응답:", response);
+          // 부모 컴포넌트에 읽음 상태 변경 알림
+          if (onMessageSent) {
+            onMessageSent();
+          }
+        } catch (err) {
+          console.error("읽음 상태 변경 실패:", err);
+        }
+      }
+    };
+    
+    if (user && message) {
+      markAsRead();
+    }
+  }, [message, user]);
 
   const handleReplySubmit = async (e) => {
     e.preventDefault();

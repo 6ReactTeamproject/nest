@@ -1,13 +1,21 @@
 // 좋아요 버튼 컴포넌트
 function LikeButton({ comment, currentUser, onLike }) {
-  // likedUserIds가 배열인지 확인 후 아니면 빈배열
-  const likedUserIds = Array.isArray(comment.likedUserIds)
-    ? comment.likedUserIds
-    : [];
+  // likedUserIds를 배열로 변환 (문자열일 수 있으므로)
+  let likedUserIds = [];
+  if (Array.isArray(comment.likedUserIds)) {
+    likedUserIds = comment.likedUserIds.map(id => Number(id)).filter(id => !isNaN(id));
+  } else if (typeof comment.likedUserIds === 'string' && comment.likedUserIds.trim() !== '') {
+    likedUserIds = comment.likedUserIds
+      .split(',')
+      .map(id => id.trim())
+      .filter(id => id !== '')
+      .map(id => Number(id))
+      .filter(id => !isNaN(id));
+  }
 
   // 현재 유저가 이미 좋아요 눌렀는지 확인 (유저가 로그인했고, likedUserIds에 유저 id가 있으면 true)
   const alreadyLiked = currentUser
-    ? likedUserIds.includes(currentUser.id)
+    ? likedUserIds.includes(Number(currentUser.id))
     : false;
 
   return (
