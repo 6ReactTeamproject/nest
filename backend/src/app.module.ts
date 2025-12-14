@@ -19,6 +19,7 @@ import { MessageModule } from './messages/messages.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { ChatModule } from './chat/chat.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { ChatModule } from './chat/chat.module';
     MessageModule, // 쪽지 모듈
     AuthModule, // 인증 모듈
     ChatModule, // 채팅 모듈
+    UploadModule, // 파일 업로드 모듈
   ],
 })
 export class AppModule {}

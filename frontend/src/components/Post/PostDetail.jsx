@@ -18,7 +18,7 @@ import CommentForm from "../Comment/CommentForm";
 import { apiGet, apiPatch } from "../../api/fetch";
 import { useToast } from "../common/Toast";
 import { findUserById, formatDate } from "../../utils/helpers";
-import { MESSAGES } from "../../constants";
+import { MESSAGES, API_BASE_URL } from "../../constants";
 import "../../styles/post.css";
 
 function PostDetail() {
@@ -177,7 +177,11 @@ function PostDetail() {
         {post.image && (
           <div className="post-detail-image-box">
             <img
-              src={post.image}
+              src={
+                post.image.startsWith("http")
+                  ? post.image
+                  : `${API_BASE_URL}${post.image}`
+              }
               alt="게시글 이미지"
               className="post-detail-image"
             />

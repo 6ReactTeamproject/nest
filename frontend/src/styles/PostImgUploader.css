@@ -4,3 +4,44 @@
   border-radius: 0;
   object-fit: contain;
 }
+
+.post-image-uploader {
+  position: relative;
+  margin-top: 10px;
+}
+
+.image-preview-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.image-remove-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.image-remove-button:hover {
+  background-color: rgba(255, 0, 0, 0.8);
+}
+
+.placeholder-image {
+  padding: 20px;
+  text-align: center;
+  color: #999;
+  border: 2px dashed #ddd;
+  border-radius: 4px;
+}

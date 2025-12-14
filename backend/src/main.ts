@@ -15,6 +15,9 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
+import * as fs from 'fs';
 
 /**
  * 애플리케이션 부트스트랩 함수
@@ -26,8 +29,23 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
  * - 서버 시작: 지정된 포트에서 HTTP 서버 시작
  */
 async function bootstrap() {
+  // 업로드 디렉토리 생성 (서버 시작 시 자동 생성)
+  // 왜 필요한가? 다른 팀원이 코드를 받았을 때 uploads 폴더가 없어도 자동으로 생성되도록
+  const uploadsDir = join(process.cwd(), 'uploads');
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+    console.log('✅ uploads 폴더가 자동으로 생성되었습니다.');
+  }
+  
   // NestJS 애플리케이션 인스턴스 생성
-  const app = await NestFactory.create(AppModule);
+  // NestExpressApplication: Express 플랫폼을 사용하여 정적 파일 서빙 가능
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  
+  // 정적 파일 서빙 설정: uploads 폴더를 /uploads 경로로 서빙
+  // 왜 필요한가? 업로드된 이미지 파일을 웹에서 접근할 수 있게 하기 위해
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/uploads', // /uploads 경로로 접근 가능
+  });
   
   // CORS (Cross-Origin Resource Sharing) 활성화
   // 왜 필요한가? 프론트엔드와 백엔드가 다른 포트에서 실행되므로 CORS 필요
@@ -36,10 +54,13 @@ async function bootstrap() {
     credentials: true, // 쿠키와 인증 정보를 포함한 요청 허용
   });
   
-  // 응답 헤더에 charset 설정
+  // 응답 헤더에 charset 설정 (JSON 응답에만 적용)
   // 왜 필요한가? 한글 등 UTF-8 문자가 올바르게 표시되도록 하기 위해
   app.use((req, res, next) => {
-    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    // 정적 파일 요청이 아닌 경우에만 JSON 헤더 설정
+    if (!req.path.startsWith('/uploads')) {
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    }
     next();
   });
   

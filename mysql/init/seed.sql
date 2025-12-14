@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
     loginId VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
-    image VARCHAR(255) NULL,
+    image TEXT NULL,
     giturl VARCHAR(255) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS members (
     user_id INT UNIQUE NOT NULL,
     name VARCHAR(255) NOT NULL,
     introduction TEXT NOT NULL,
-    imageUrl VARCHAR(255) NULL,
+    imageUrl TEXT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_user_id (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS semester (
     authorId INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
-    imageUrl VARCHAR(255) NULL,
+    imageUrl TEXT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (authorId) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_authorId (authorId)
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS posts (
     userId INT NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     views INT DEFAULT 0,
-    image VARCHAR(255) NULL,
+    image TEXT NULL,
     FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_userId (userId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

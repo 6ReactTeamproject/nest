@@ -77,6 +77,7 @@ const PostForm = ({ post, setPost, onSubmit, id, isLoading = false }) => {
       />
       <div className="post-form-image">
         <PostImgUploader
+          initialImage={post.image || null}
           onChangeImage={(img) => {
             setPost((prev) => ({ ...prev, image: img }));
           }}

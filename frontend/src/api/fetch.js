@@ -329,3 +329,55 @@ export async function apiDelete(endpoint, id) {
   }
   return true;
 }
+
+/**
+ * 이미지 파일 업로드 함수
+ * base64 이미지를 Blob으로 변환하여 서버에 업로드합니다.
+ * 
+ * 왜 필요한가?
+ * - 파일 업로드: 크롭된 이미지를 서버에 업로드하고 경로를 받아옴
+ * - base64 변환: 크롭된 이미지(base64)를 Blob으로 변환하여 FormData로 전송
+ * 
+ * @param {string} base64Image - base64 형식의 이미지 문자열
+ * @returns {Promise<string>} 업로드된 파일의 경로 (예: /uploads/uuid-filename.jpg)
+ */
+export async function apiUploadImage(base64Image) {
+  // base64 문자열을 Blob으로 변환
+  // 왜 Blob으로 변환하나? FormData로 파일을 전송하기 위해
+  const response = await fetch(base64Image);
+  const blob = await response.blob();
+  
+  // FormData 생성
+  const formData = new FormData();
+  formData.append('file', blob, 'image.jpg');
+  
+  // 토큰 가져오기
+  const token = localStorage.getItem("access_token");
+  if (!token) {
+    throw new Error("인증이 필요합니다. 로그인해주세요.");
+  }
+  
+  // 파일 업로드 요청
+  const res = await fetch(`${API_BASE}/upload/image`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      // FormData 사용 시 Content-Type 헤더를 설정하지 않음 (브라우저가 자동 설정)
+    },
+    body: formData,
+  });
+  
+  if (!res.ok) {
+    const result = await handleErrorResponse(res, {
+      method: "POST",
+      url: `${API_BASE}/upload/image`,
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+    if (result !== undefined) return result.path;
+    throw new Error("이미지 업로드에 실패했습니다.");
+  }
+  
+  const data = await res.json();
+  return data.path; // 업로드된 파일의 경로 반환
+}
