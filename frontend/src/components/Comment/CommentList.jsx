@@ -1,7 +1,7 @@
 /**
  * 댓글/대댓글 목록 컴포넌트
  * 게시글에 달린 댓글과 대댓글을 표시하고 관리하는 컴포넌트입니다.
- * 
+ *
  * 왜 필요한가?
  * - 댓글 표시: 게시글에 달린 댓글 목록을 보여줌
  * - 대댓글 기능: 댓글에 댓글을 달 수 있는 대댓글 기능 지원
@@ -20,10 +20,10 @@ import { MESSAGES } from "../../constants";
 import "../../styles/comment.css";
 
 export default function CommentList({
-  comments,        // 전체 댓글 배열
-  setComments,     // 댓글 리스트를 업데이트하는 함수
-  users,           // 사용자 정보 배열 (작성자 정보 찾기용)
-  currentUser,     // 로그인 중인 사용자 정보 (권한 체크용)
+  comments, // 전체 댓글 배열
+  setComments, // 댓글 리스트를 업데이트하는 함수
+  users, // 사용자 정보 배열 (작성자 정보 찾기용)
+  currentUser, // 로그인 중인 사용자 정보 (권한 체크용)
 }) {
   // 현재 수정 중인 댓글 ID
   // 왜 필요한가? 어떤 댓글이 수정 모드인지 추적하기 위해
@@ -38,11 +38,11 @@ export default function CommentList({
 
   /**
    * 특정 댓글의 대댓글을 가져오는 함수
-   * 
+   *
    * 왜 필요한가?
    * - 대댓글 필터링: 특정 댓글의 대댓글만 추출
    * - 계층 구조: 댓글과 대댓글을 구분하여 표시
-   * 
+   *
    * @param {number} parentId - 부모 댓글 ID
    * @returns {Array} 해당 댓글의 대댓글 배열
    */
@@ -53,7 +53,7 @@ export default function CommentList({
   /**
    * 댓글 수정 모드 진입 핸들러
    * 수정 버튼을 누르면 해당 댓글을 수정 모드로 전환합니다.
-   * 
+   *
    * 왜 필요한가? 수정 모드를 추적하여 수정 폼을 표시하기 위해
    */
   const handleEdit = (comment) => {
@@ -63,7 +63,7 @@ export default function CommentList({
   /**
    * 댓글 수정/저장 핸들러
    * 댓글 수정을 서버에 저장하고 목록을 업데이트합니다.
-   * 
+   *
    * 왜 필요한가?
    * - 댓글 수정: 사용자가 작성한 댓글을 수정할 수 있게 함
    * - 상태 업데이트: 수정된 댓글을 목록에 반영
@@ -90,7 +90,7 @@ export default function CommentList({
   /**
    * 댓글 삭제 핸들러
    * 댓글을 삭제하고 목록에서 제거합니다.
-   * 
+   *
    * 왜 필요한가?
    * - 댓글 삭제: 사용자가 작성한 댓글을 삭제할 수 있게 함
    * - 확인 다이얼로그: 실수로 삭제하는 것을 방지
@@ -114,7 +114,7 @@ export default function CommentList({
   /**
    * 댓글 좋아요 처리 핸들러
    * 댓글에 좋아요를 누르거나 취소합니다.
-   * 
+   *
    * 왜 필요한가?
    * - 좋아요 기능: 사용자가 댓글에 좋아요를 표현할 수 있게 함
    * - 상태 업데이트: 좋아요 수와 좋아요한 사용자 목록을 업데이트
@@ -128,26 +128,32 @@ export default function CommentList({
     }
     try {
       // 서버에 좋아요 토글 요청
-      const updatedComment = await apiPatch("comments", `${comment.id}/like`, {});
-<<<<<<< HEAD
-      
+      const updatedComment = await apiPatch(
+        "comments",
+        `${comment.id}/like`,
+        {}
+      );
+
+      // 댓글 목록 업데이트: 좋아요 수와 좋아요한 사용자 목록 업데이트
+      // map: 모든 댓글을 순회하며 좋아요가 업데이트된 댓글만 변경
       // likedUserIds를 배열로 변환 (문자열일 수 있으므로)
       let likedUserIds = [];
       if (Array.isArray(updatedComment.likedUserIds)) {
-        likedUserIds = updatedComment.likedUserIds.map(id => Number(id)).filter(id => !isNaN(id));
-      } else if (typeof updatedComment.likedUserIds === 'string' && updatedComment.likedUserIds.trim() !== '') {
         likedUserIds = updatedComment.likedUserIds
-          .split(',')
-          .map(id => id.trim())
-          .filter(id => id !== '')
-          .map(id => Number(id))
-          .filter(id => !isNaN(id));
+          .map((id) => Number(id))
+          .filter((id) => !isNaN(id));
+      } else if (
+        typeof updatedComment.likedUserIds === "string" &&
+        updatedComment.likedUserIds.trim() !== ""
+      ) {
+        likedUserIds = updatedComment.likedUserIds
+          .split(",")
+          .map((id) => id.trim())
+          .filter((id) => id !== "")
+          .map((id) => Number(id))
+          .filter((id) => !isNaN(id));
       }
-      
-=======
-      // 댓글 목록 업데이트: 좋아요 수와 좋아요한 사용자 목록 업데이트
-      // map: 모든 댓글을 순회하며 좋아요가 업데이트된 댓글만 변경
->>>>>>> 6508d0144fa98ebfa0d35614ecbfa861759feb9a
+
       setComments((prev) =>
         prev.map((c) =>
           c.id === comment.id

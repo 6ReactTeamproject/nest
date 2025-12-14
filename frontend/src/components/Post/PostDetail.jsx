@@ -1,7 +1,7 @@
 /**
  * 게시글 상세 페이지 컴포넌트
  * 게시글의 상세 내용과 댓글을 표시하는 페이지입니다.
- * 
+ *
  * 왜 필요한가?
  * - 게시글 상세 표시: 게시글의 전체 내용을 보여줌
  * - 댓글 기능: 게시글에 달린 댓글을 표시하고 작성할 수 있게 함
@@ -32,7 +32,7 @@ function PostDetail() {
   const location = useLocation();
   // Toast 알림 함수
   const { error: showError } = useToast();
-  
+
   // 게시글 데이터 상태
   const [post, setPost] = useState(null);
   // 게시글 작성자 정보 상태
@@ -47,7 +47,7 @@ function PostDetail() {
   /**
    * 데이터 로딩 효과
    * 컴포넌트가 마운트되거나 게시글 ID가 변경될 때 데이터를 로드합니다.
-   * 
+   *
    * 왜 필요한가?
    * - 초기 데이터 로드: 페이지 진입 시 게시글, 댓글, 사용자 정보 로드
    * - 병렬 로딩: Promise.all을 사용하여 여러 API를 동시에 호출하여 성능 최적화
@@ -58,52 +58,47 @@ function PostDetail() {
     const loadData = async () => {
       try {
         setIsLoading(true);
-        
+
         // 사용자 목록과 게시글, 댓글을 병렬로 로드
         // Promise.all: 여러 비동기 작업을 동시에 실행하여 성능 최적화
         // 왜 병렬로 하나? 순차적으로 실행하면 시간이 오래 걸리므로
         const [usersData, postData, commentsData] = await Promise.all([
-          apiGet("user/all"),                    // 모든 사용자 정보
-          apiGet("posts", id),                   // 게시글 정보
-          apiGet("comments", `?postId=${id}`),   // 댓글 목록
+          apiGet("user/all"), // 모든 사용자 정보
+          apiGet("posts", id), // 게시글 정보
+          apiGet("comments", `?postId=${id}`), // 댓글 목록
         ]);
 
         setUsers(usersData);
         setPost(postData);
-        
-<<<<<<< HEAD
-        // 댓글 데이터 보정
-        const enriched = commentsData.map((c) => {
-          // likedUserIds를 배열로 변환 (문자열일 수 있으므로)
-          let likedUserIds = [];
-          if (Array.isArray(c.likedUserIds)) {
-            likedUserIds = c.likedUserIds.map(id => Number(id)).filter(id => !isNaN(id));
-          } else if (typeof c.likedUserIds === 'string' && c.likedUserIds.trim() !== '') {
-            likedUserIds = c.likedUserIds
-              .split(',')
-              .map(id => id.trim())
-              .filter(id => id !== '')
-              .map(id => Number(id))
-              .filter(id => !isNaN(id));
-          }
-          
-          return {
-            ...c,
-            createdAt: c.createdAt || new Date().toISOString(),
-            likes: c.likes || 0,
-            likedUserIds: likedUserIds,
-          };
-        });
-=======
+
         // 댓글 데이터 보정: 누락된 필드를 기본값으로 채움
         // 왜 필요한가? 서버에서 일부 필드가 누락될 수 있으므로
-        const enriched = commentsData.map((c) => ({
-          ...c,
-          createdAt: c.createdAt || new Date().toISOString(), // 생성일시 기본값
-          likes: c.likes || 0,                                 // 좋아요 수 기본값
-          likedUserIds: Array.isArray(c.likedUserIds) ? c.likedUserIds : [], // 좋아요한 사용자 ID 배열 기본값
-        }));
->>>>>>> 6508d0144fa98ebfa0d35614ecbfa861759feb9a
+        // likedUserIds를 배열로 변환 (문자열일 수 있으므로)
+        const enriched = commentsData.map((c) => {
+          let likedUserIds = [];
+          if (Array.isArray(c.likedUserIds)) {
+            likedUserIds = c.likedUserIds
+              .map((id) => Number(id))
+              .filter((id) => !isNaN(id));
+          } else if (
+            typeof c.likedUserIds === "string" &&
+            c.likedUserIds.trim() !== ""
+          ) {
+            likedUserIds = c.likedUserIds
+              .split(",")
+              .map((id) => id.trim())
+              .filter((id) => id !== "")
+              .map((id) => Number(id))
+              .filter((id) => !isNaN(id));
+          }
+
+          return {
+            ...c,
+            createdAt: c.createdAt || new Date().toISOString(), // 생성일시 기본값
+            likes: c.likes || 0, // 좋아요 수 기본값
+            likedUserIds: likedUserIds, // 좋아요한 사용자 ID 배열
+          };
+        });
         setComments(enriched);
 
         // 조회수 증가 (에러는 무시)
@@ -131,7 +126,7 @@ function PostDetail() {
   /**
    * 게시판으로 돌아가는 함수
    * 게시판 목록 페이지로 돌아갑니다.
-   * 
+   *
    * 왜 필요한가?
    * - 네비게이션: 사용자가 게시판 목록으로 돌아갈 수 있게 함
    * - 상태 유지: 이전 페이지의 페이지 번호, 정렬 방식 등을 유지
@@ -182,18 +177,14 @@ function PostDetail() {
         {post.image && (
           <div className="post-detail-image-box">
             <img
-              src={post.image} 
+              src={post.image}
               alt="게시글 이미지"
               className="post-detail-image"
             />
           </div>
         )}
         {/* 게시글 수정/삭제 버튼 및 동작 */}
-        <PostActions
-          post={post}
-          currentUser={currentUser}
-          id={id}
-        />
+        <PostActions post={post} currentUser={currentUser} id={id} />
       </div>
       {/* 댓글 섹션 */}
       <div className="comment-section">
