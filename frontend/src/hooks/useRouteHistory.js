@@ -1,14 +1,31 @@
+/**
+ * 라우팅 히스토리 관리 훅
+ * React Router의 라우팅 히스토리를 추적하고 관리합니다.
+ * 
+ * 왜 필요한가?
+ * - 로그인 사용자 보호: 로그인한 사용자가 뒤로가기로 로그인/회원가입 페이지에 접근하는 것을 방지
+ * - 히스토리 추적: 사용자가 방문한 경로를 추적하여 적절한 페이지로 리다이렉트
+ * - 사용자 경험 향상: 로그인 후 이전 페이지로 돌아가거나 로그인 페이지 접근 방지
+ */
+
 import { useEffect, useRef } from "react";
 import { useLocation, useNavigationType, useNavigate } from "react-router-dom";
 import { useUser } from "./UserContext";
 
 export const useRouteHistory = () => {
-  const location = useLocation();            // 현재 URL 정보 가져오기
-  const navType = useNavigationType();       // 이동 유형: PUSH, REPLACE, POP
-  const nav = useNavigate();                  // 페이지 이동 함수
-  const user = useUser();                     // 로그인한 사용자 정보
-  const routeHistory = useRef([]);            // 단순 방문 경로 기록용 ref
-  const customHistory = useRef({              // 커스텀 히스토리 스택 관리용 ref
+  // 현재 URL 정보 가져오기
+  const location = useLocation();
+  // 이동 유형: PUSH (새 페이지), REPLACE (현재 페이지 교체), POP (뒤로/앞으로 이동)
+  const navType = useNavigationType();
+  // 페이지 이동 함수
+  const nav = useNavigate();
+  // 로그인한 사용자 정보
+  const user = useUser();
+  // 단순 방문 경로 기록용 ref (사용되지 않지만 필요시 사용 가능)
+  const routeHistory = useRef([]);
+  // 커스텀 히스토리 스택 관리용 ref
+  // 왜 ref를 사용하나? 컴포넌트 리렌더링 시에도 값이 유지되도록 하기 위해
+  const customHistory = useRef({
     entries: [],                             // 방문한 경로 목록 배열
     index: -1,                              // 현재 위치 인덱스 초기값 -1
   });
