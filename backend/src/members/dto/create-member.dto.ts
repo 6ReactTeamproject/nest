@@ -34,11 +34,11 @@ export class CreateMemberDto {
   @MinLength(1, { message: '소개는 최소 1자 이상이어야 합니다.' })
   introduction: string;
 
-  // 멤버 이미지 URL 필드 (선택적)
+  // 멤버 이미지 URL 또는 경로 필드 (선택적)
   // 왜 선택적인가? 이미지가 없는 멤버 소개도 작성할 수 있어야 하므로
-  // 왜 URL 검증이 필요한가? 잘못된 URL 형식을 방지하여 데이터베이스 오류 방지
+  // 외부 URL (예: https://example.com/image.jpg) 또는 로컬 경로 (예: /uploads/uuid-filename.jpg) 모두 허용
+  // 왜 URL 검증을 선택적으로 하나? 로컬 경로(/uploads/...)도 허용해야 하므로
   @IsOptional()
   @IsString({ message: '이미지는 문자열이어야 합니다.' })
-  @IsUrl({}, { message: '올바른 URL 형식이 아닙니다.' })
   imageUrl?: string;
 }

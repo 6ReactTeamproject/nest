@@ -4,6 +4,7 @@ import { useUser } from "../../hooks/UserContext";
 import { useEffect, useState } from "react";
 import { apiGet } from "../../api/fetch";
 import HandleAuth from "../common/HandleAuth";
+import { API_BASE_URL } from "../../constants";
 
 export default function IntroList({
   heading,
@@ -48,7 +49,13 @@ export default function IntroList({
             onClick={() => navigate(`/${pathPrefix}/${item.id}`)} // 클릭 시 상세 페이지 이동
           >
             <img
-              src={item[imageKey] ? item[imageKey] : DEFAULT_PROFILE} // 이미지가 없으면 기본 이미지
+              src={
+                item[imageKey]
+                  ? item[imageKey].startsWith('http')
+                    ? item[imageKey]
+                    : `${API_BASE_URL}${item[imageKey]}`
+                  : DEFAULT_PROFILE
+              } // 이미지가 없으면 기본 이미지, 로컬 경로인 경우 API_BASE_URL 추가
               alt={item[primaryKey]} // 이미지 대체 텍스트
               onError={(e) => {
                 e.target.onerror = null; // 무한 루프 방지

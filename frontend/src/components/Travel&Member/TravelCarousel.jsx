@@ -2,6 +2,7 @@ import Slider from "react-slick";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiGet } from "../../api/fetch";
+import { API_BASE_URL } from "../../constants";
 import "../../styles/travel.css";
 
 export default function TravelCarousel() {
@@ -52,7 +53,13 @@ export default function TravelCarousel() {
             onClick={() => navigate(`/intro/${item.id}`)} // 클릭 시 상세 페이지로 이동
           >
             <img
-              src={item.imageUrl || "https://placehold.co/600x400?text=No+Image"}
+              src={
+                item.imageUrl
+                  ? item.imageUrl.startsWith('http')
+                    ? item.imageUrl
+                    : `${API_BASE_URL}${item.imageUrl}`
+                  : "https://placehold.co/600x400?text=No+Image"
+              }
               alt={item.title || "이미지 없음"}
               className="carousel-image"
               onError={(e) => {

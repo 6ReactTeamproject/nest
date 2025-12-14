@@ -16,7 +16,7 @@ import { useToast } from "../components/common/Toast";
 import { API_BASE_URL } from "../constants";
 import "../styles/PostImgUploader.css";
 
-export default function PostImgUploader({ onChangeImage, Shape = "square", initialImage = null }) {
+export default function PostImgUploader({ onChangeImage, Shape = "square", initialImage = null, setInputs = null }) {
   // 최종적으로 보여줄 이미지 미리보기 (업로드된 이미지 경로 또는 base64)
   // 왜 필요한가? 사용자가 선택한 이미지를 미리 확인할 수 있게 함
   const [preview, setPreview] = useState(() => {
@@ -107,6 +107,12 @@ export default function PostImgUploader({ onChangeImage, Shape = "square", initi
         // 부모 컴포넌트에 업로드된 이미지 경로 전달
         // 왜 경로를 전달하나? DB에 경로만 저장하면 되므로
         onChangeImage(imagePath);
+      } else if (setInputs) {
+        // CreateButton이나 EditForm에서 사용하는 경우 imageUrl에 저장
+        setInputs((prev) => ({
+          ...prev,
+          imageUrl: imagePath,
+        }));
       }
       
       setImageSrc(null); // 모달 닫기
@@ -130,6 +136,12 @@ export default function PostImgUploader({ onChangeImage, Shape = "square", initi
     if (onChangeImage) {
       // 부모 컴포넌트에 빈 문자열 전달하여 이미지 제거
       onChangeImage("");
+    } else if (setInputs) {
+      // CreateButton이나 EditForm에서 사용하는 경우 imageUrl 제거
+      setInputs((prev) => ({
+        ...prev,
+        imageUrl: "",
+      }));
     }
   };
 

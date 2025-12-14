@@ -5,6 +5,7 @@ import EditMember from "./EditMember";
 import DeleteButton from "../../components/Travel&Member/DeleteButton";
 import { useUser } from "../../hooks/UserContext";
 import { compareIds } from "../../utils/helpers";
+import { API_BASE_URL } from "../../constants";
 import "../../styles/travel.css";
 import "../../styles/post.css";
 
@@ -68,7 +69,7 @@ function DetailMember() {
             {/* 이미지가 있을 경우 출력 */}
             {members.imageUrl && (
               <img  
-                src={members.imageUrl}
+                src={members.imageUrl.startsWith('http') ? members.imageUrl : `${API_BASE_URL}${members.imageUrl}`}
                 alt="preview"
                 style={{ maxWidth: "340px", borderRadius: "8px" }}
               />

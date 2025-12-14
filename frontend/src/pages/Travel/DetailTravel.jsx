@@ -5,6 +5,7 @@ import DeleteButton from "../../components/Travel&Member/DeleteButton";
 import EditTravelIntro from "./EditTravelIntro";
 import { useUser } from "../../hooks/UserContext";
 import { compareIds } from "../../utils/helpers";
+import { API_BASE_URL } from "../../constants";
 import "../../styles/post.css";
 import "../../styles/travel.css";
 
@@ -68,7 +69,7 @@ export default function DetailTravel() {
           {/* 이미지가 있을 경우 출력 */}
           {travelPlace.imageUrl && (
             <img
-              src={travelPlace.imageUrl}
+              src={travelPlace.imageUrl.startsWith('http') ? travelPlace.imageUrl : `${API_BASE_URL}${travelPlace.imageUrl}`}
               alt="preview"
               style={{ maxWidth: "340px", borderRadius: "8px" }}
             />
