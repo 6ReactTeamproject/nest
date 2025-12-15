@@ -53,12 +53,12 @@ export class CreateUserDto {
   })
   name: string;
 
-  // 프로필 이미지 URL 필드 (선택적)
+  // 프로필 이미지 URL 또는 경로 필드 (선택적)
   // 왜 선택적인가? 이미지가 없는 사용자도 생성할 수 있어야 하므로
-  // 왜 URL 검증이 필요한가? 잘못된 URL 형식을 방지하여 데이터베이스 오류 방지
+  // 외부 URL (예: https://example.com/image.jpg) 또는 로컬 경로 (예: /uploads/uuid-filename.jpg) 모두 허용
+  // 왜 URL 검증을 선택적으로 하나? 로컬 경로(/uploads/...)도 허용해야 하므로
   @IsOptional()
   @IsString({ message: '이미지는 문자열이어야 합니다.' })
-  @IsUrl({}, { message: '올바른 URL 형식이 아닙니다.' })
   image?: string;
 
   // Git URL 필드 (선택적)
