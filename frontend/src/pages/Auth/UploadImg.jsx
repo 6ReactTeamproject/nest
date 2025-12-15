@@ -38,17 +38,16 @@ export default function UploadImg({ shape = "round" }) {
 
   return (
     <>
-      {/* 이미지 업로드 UI */}
       <div
         className="upload-img-wrapper"
-        onClick={() => fileInputRef.current.click()} // 이미지를 클릭하면 파일 입력창 열기
+        onClick={() => fileInputRef.current.click()}
       >
         <input
           type="file"
           accept="image/*"
           ref={fileInputRef}
           onChange={handleImageChange}
-          style={{ display: "none" }} // 기본 input은 숨김
+          style={{ display: "none" }}
         />
         <img src={preview} alt="프로필" className="profile-img" />
         <div className="edit-overlay">
@@ -60,13 +59,12 @@ export default function UploadImg({ shape = "round" }) {
         </div>
       </div>
 
-      {/* 이미지 자르기 모달 */}
       {imageSrc && (
         <CropModal
-          imageSrc={imageSrc} // 원본 이미지 소스
-          onClose={() => setImageSrc(null)} // 모달 닫기 함수
-          onCropComplete={handleCropComplete} // 자르기 완료 시 실행될 함수
-          Shape={shape} // 자르기 모양 ('round' 또는 'square')
+          imageSrc={imageSrc}
+          onClose={() => setImageSrc(null)}
+          onCropComplete={handleCropComplete}
+          Shape={shape}
         />
       )}
     </>

@@ -21,7 +21,6 @@ const WritePost = () => {
       if (id) {
         try {
           const data = await apiGet("posts", id);
-          // 기존 이미지 경로 설정 (외부 URL이거나 로컬 경로)
           const imagePath = data.image || "";
           setPost({
             title: data.title,
