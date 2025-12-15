@@ -1,7 +1,7 @@
 /* 플로팅 채팅 버튼 */
 .floating-chat-button {
   position: fixed;
-  bottom: 20px;
+  bottom: 100px;
   right: 20px;
   width: 60px;
   height: 60px;
@@ -68,7 +68,7 @@
 /* 채팅 윈도우 */
 .chat-window {
   position: fixed;
-  bottom: 90px;
+  bottom: 170px;
   right: 20px;
   width: 380px;
   height: 600px;
@@ -535,13 +535,13 @@
   .chat-window {
     width: calc(100vw - 40px);
     height: calc(100vh - 120px);
-    bottom: 90px;
+    bottom: 170px;
     right: 20px;
     left: 20px;
   }
 
   .floating-chat-button {
-    bottom: 20px;
+    bottom: 100px;
     right: 20px;
   }
 }
