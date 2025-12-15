@@ -1,7 +1,4 @@
-/**
- * 방 입장 DTO
- * 방 입장 시 필요한 데이터를 검증합니다.
- */
+
 
 import { IsString, IsNotEmpty } from 'class-validator';
 

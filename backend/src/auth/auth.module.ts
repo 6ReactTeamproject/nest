@@ -18,11 +18,11 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService): JwtModuleOptions => {
-        const expiresIn = configService.get<string>('JWT_EXPIRES_IN') || '15m'; // 액세스 토큰: 15분
+        const expiresIn = configService.get<string>('JWT_EXPIRES_IN') || '15m'; 
         return {
           secret: configService.get<string>('JWT_SECRET') || 'your-secret-key-change-in-production',
           signOptions: {
-            expiresIn: expiresIn as SignOptions['expiresIn'], // jsonwebtoken의 SignOptions 타입 사용
+            expiresIn: expiresIn as SignOptions['expiresIn'], 
           } as SignOptions,
         };
       },

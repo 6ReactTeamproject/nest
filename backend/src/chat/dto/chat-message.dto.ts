@@ -1,7 +1,4 @@
-/**
- * 채팅 메시지 DTO
- * 채팅 메시지 전송 시 필요한 데이터를 검증합니다.
- */
+
 
 import { IsString, IsNotEmpty } from 'class-validator';
 

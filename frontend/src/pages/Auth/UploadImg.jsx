@@ -9,7 +9,6 @@ import CropModal from "../../utils/CropModal";
 export default function UploadImg({ shape = "round" }) {
   const { user, setUser } = useUser();
   const [preview, setPreview] = useState(() => {
-    // 초기 이미지 설정: user?.image가 있으면 URL 처리
     if (user?.image) {
       return user.image.startsWith("http")
         ? user.image
@@ -23,14 +22,13 @@ export default function UploadImg({ shape = "round" }) {
   const fileInputRef = useRef();
   const { success, error: showError } = useToast();
 
-  // user?.image가 변경될 때 preview 업데이트
   useEffect(() => {
     if (user?.image) {
       const fullImageUrl = user.image.startsWith("http")
         ? user.image
         : `${API_BASE_URL}${user.image}`;
       setPreview(fullImageUrl);
-      setImageError(false); // 이미지 변경 시 에러 상태 초기화
+      setImageError(false);
     } else {
       setPreview(null);
       setImageError(false);
@@ -52,10 +50,8 @@ export default function UploadImg({ shape = "round" }) {
       return;
     }
 
-    // 이미지 파일인지 확인
     if (!file.type.startsWith("image/")) {
       showError("이미지 파일만 업로드할 수 있습니다.");
-      // 파일 입력 초기화
       if (e.target) {
         e.target.value = "";
       }
@@ -71,7 +67,6 @@ export default function UploadImg({ shape = "round" }) {
     };
     reader.readAsDataURL(file);
 
-    // 파일 입력 초기화 (같은 파일을 다시 선택할 수 있도록)
     if (e.target) {
       e.target.value = "";
     }
@@ -87,49 +82,37 @@ export default function UploadImg({ shape = "round" }) {
     try {
       setIsUploading(true);
 
-      // 크롭된 이미지를 서버에 업로드
-      // apiUploadImage는 백엔드에서 반환한 경로를 그대로 반환 (예: /uploads/uuid-filename.jpg)
       const imagePath = await apiUploadImage(croppedImage);
 
-      // 경로가 올바른지 확인
       if (!imagePath || typeof imagePath !== "string") {
         throw new Error("이미지 업로드 경로를 받지 못했습니다.");
       }
 
-      // 업로드된 이미지 경로로 사용자 정보 업데이트
-      // 백엔드에 저장할 때는 경로 그대로 전송 (예: /uploads/uuid-filename.jpg)
       const updatedUserData = await apiPatch("user", user.id, {
         image: imagePath,
       });
 
-      // 백엔드에서 반환한 업데이트된 사용자 정보 사용
-      // updatedUserData가 User 엔티티 전체일 수도 있고, 일부일 수도 있음
       const finalImagePath = updatedUserData?.image || imagePath;
 
-      // 업데이트된 사용자 정보로 상태 업데이트
       const newUser = {
         ...user,
-        image: finalImagePath, // 경로 그대로 저장 (예: /uploads/uuid-filename.jpg)
+        image: finalImagePath,
       };
       localStorage.setItem("user", JSON.stringify(newUser));
       setUser(newUser);
 
-      // preview 업데이트 (표시용으로는 전체 URL 사용)
-      // 경로가 http로 시작하면 그대로 사용, 아니면 API_BASE_URL과 결합
       const fullImageUrl = finalImagePath.startsWith("http")
         ? finalImagePath
         : `${API_BASE_URL}${finalImagePath}`;
       setPreview(fullImageUrl);
       setImageError(false);
 
-      // 크롭 모달 닫기
       setImageSrc(null);
 
       success("프로필 이미지가 변경되었습니다.");
     } catch (err) {
       console.error("이미지 업로드/저장 오류:", err);
       showError(err.message || "이미지 저장 실패");
-      // 에러 발생 시에도 모달은 닫기
       setImageSrc(null);
     } finally {
       setIsUploading(false);
@@ -138,7 +121,6 @@ export default function UploadImg({ shape = "round" }) {
 
   return (
     <>
-      {/* 이미지 업로드 UI */}
       <div className="upload-img-wrapper" style={{ position: "relative" }}>
         <input
           type="file"
@@ -212,13 +194,12 @@ export default function UploadImg({ shape = "round" }) {
         )}
       </div>
 
-      {/* 이미지 자르기 모달 */}
       {imageSrc && (
         <CropModal
-          imageSrc={imageSrc} // 원본 이미지 소스
-          onClose={() => setImageSrc(null)} // 모달 닫기 함수
-          onCropComplete={handleCropComplete} // 자르기 완료 시 실행될 함수
-          Shape={shape} // 자르기 모양 ('round' 또는 'square')
+          imageSrc={imageSrc}
+          onClose={() => setImageSrc(null)}
+          onCropComplete={handleCropComplete}
+          Shape={shape}
         />
       )}
     </>

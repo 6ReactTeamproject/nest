@@ -64,7 +64,6 @@ const MessageForm = ({ onClose }) => {
     <div className="message-form">
       <h3>쪽지 작성</h3>
       <form onSubmit={handleSubmit}>
-        {/* 받는 사람 선택 박스 */}
         <select
           name="receiverId"
           value={message.receiverId}
@@ -72,7 +71,6 @@ const MessageForm = ({ onClose }) => {
           required
         >
           <option value="">받는 사람 선택</option>
-          {/* 본인을 제외한 사용자 목록 옵션 생성 */}
           {users
             .filter((u) => !compareIds(u.id, user?.id))
             .map((u) => (
@@ -101,7 +99,6 @@ const MessageForm = ({ onClose }) => {
           <button
             type="button"
             onClick={() => {
-              // 폼 초기화 후 닫기
               setMessage({
                 receiverId: "",
                 title: "",

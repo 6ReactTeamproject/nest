@@ -45,11 +45,9 @@ export default function ChangePasswordForm() {
 
   return (
     <MypageLayout>
-      {/* 비밀번호 변경 폼 */}
       <form onSubmit={handleSubmit} className="mypage-form">
         <h2 className="mypage-form-title">비밀번호 변경</h2>
 
-        {/* 현재 비밀번호 입력 필드 */}
         <input
           type="password"
           placeholder="현재 비밀번호"
@@ -59,7 +57,6 @@ export default function ChangePasswordForm() {
           required
         />
 
-        {/* 새 비밀번호 입력 필드 */}
         <input
           type="password"
           placeholder="새 비밀번호"
@@ -69,7 +66,6 @@ export default function ChangePasswordForm() {
           required
         />
 
-        {/* 새 비밀번호 확인 입력 필드 */}
         <input
           type="password"
           placeholder="새 비밀번호 확인"
@@ -79,7 +75,6 @@ export default function ChangePasswordForm() {
           required
         />
 
-        {/* 제출 버튼 */}
         <button type="submit" className="mypage-form-button">
           변경하기
         </button>
