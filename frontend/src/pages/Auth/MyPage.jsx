@@ -60,21 +60,18 @@ export default function MyPage() {
 
   return (
     <MypageLayout>
-      {/* 사용자 프로필 영역 */}
       <h2>마이페이지</h2>
       <div className="profile-card">
-        <UploadImg /> {/* 프로필 이미지 수정 */}
+        <UploadImg />
         <div className="profile-info">
           <h3>{user.name}</h3>
           <p>아이디 : {user.loginId}</p>
-          <GitForm /> {/* 깃허브 주소 입력/수정 */}
+          <GitForm />
         </div>
       </div>
 
-      {/* 내가 작성한 글 영역 */}
       <h2>내가 쓴 글</h2>
       <div className="my-articles">
-        {/* 게시판 글 목록 */}
         <h3>📌 게시판</h3>
         <ul>
           {myPosts.length > 0 ? (
@@ -88,7 +85,6 @@ export default function MyPage() {
           )}
         </ul>
 
-        {/* 멤버 소개 목록 */}
         <h3>👥 멤버 소개</h3>
         <ul>
           {myMembers.length > 0 ? (
@@ -102,7 +98,6 @@ export default function MyPage() {
           )}
         </ul>
 
-        {/* 여행 소개 목록 */}
         <h3>🌍 여행 소개</h3>
         <ul>
           {myTravels.length > 0 ? (

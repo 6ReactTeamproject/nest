@@ -212,13 +212,12 @@ export default function UploadImg({ shape = "round" }) {
         )}
       </div>
 
-      {/* 이미지 자르기 모달 */}
       {imageSrc && (
         <CropModal
-          imageSrc={imageSrc} // 원본 이미지 소스
-          onClose={() => setImageSrc(null)} // 모달 닫기 함수
-          onCropComplete={handleCropComplete} // 자르기 완료 시 실행될 함수
-          Shape={shape} // 자르기 모양 ('round' 또는 'square')
+          imageSrc={imageSrc}
+          onClose={() => setImageSrc(null)}
+          onCropComplete={handleCropComplete}
+          Shape={shape}
         />
       )}
     </>

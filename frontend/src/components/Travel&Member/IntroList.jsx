@@ -14,17 +14,15 @@ export default function IntroList({
   imageKey,
   pathPrefix,
 }) {
-  const [items, setItems] = useState([]); // 받아온 데이터 저장 상태
-    const navigate = useNavigate(); // 페이지 이동용 훅
-    const { user } = useUser(); // 로그인 유저 정보
+  const [items, setItems] = useState([]);
+    const navigate = useNavigate();
+    const { user } = useUser();
 
-  // 기본 이미지
   const DEFAULT_PROFILE = "https://placehold.co/48x48?text=No+Img&font=roboto";
 
   useEffect(() => {
     apiGet(endpoint)
       .then((res) => {
-        // 응답이 { message, data } 형식이면 data 사용, 아니면 직접 사용
         const items = res.data ?? res;
         setItems(Array.isArray(items) ? items : []);
       })
@@ -38,15 +36,14 @@ export default function IntroList({
       }`}
     >
       <div className="intro-header">
-        <h1>{heading}</h1> {/* 제목 표시 */}
+        <h1>{heading}</h1>
       </div>
       <div className="travel-grid">
-        {/* 받아온 아이템들을 카드 형식으로 렌더링 */}
         {items.map((item) => (
           <div
             key={item.id}
             className="travel-card"
-            onClick={() => navigate(`/${pathPrefix}/${item.id}`)} // 클릭 시 상세 페이지 이동
+            onClick={() => navigate(`/${pathPrefix}/${item.id}`)}
           >
             <img
               src={
@@ -55,15 +52,15 @@ export default function IntroList({
                     ? item[imageKey]
                     : `${API_BASE_URL}${item[imageKey]}`
                   : DEFAULT_PROFILE
-              } // 이미지가 없으면 기본 이미지, 로컬 경로인 경우 API_BASE_URL 추가
-              alt={item[primaryKey]} // 이미지 대체 텍스트
+              }
+              alt={item[primaryKey]}
               onError={(e) => {
-                e.target.onerror = null; // 무한 루프 방지
-                e.target.src = DEFAULT_PROFILE; // 로딩 실패 시 기본 이미지로 교체
+                e.target.onerror = null;
+                e.target.src = DEFAULT_PROFILE;
               }}
             />
-            <h3>{item[primaryKey]}</h3> {/* 주요 키 값 */}
-            <p>{item[secondaryKey]}</p> {/* 부가 설명 */}
+            <h3>{item[primaryKey]}</h3>
+            <p>{item[secondaryKey]}</p>
           </div>
         ))}
       </div>
