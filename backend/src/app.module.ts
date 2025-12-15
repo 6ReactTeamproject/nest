@@ -25,7 +25,7 @@ import { UploadModule } from './upload/upload.module';
       password: '1234',
       database: 'db',
       charset: 'utf8mb4',
-      entities: [__dirname + '*.entity{.ts,.js}'],
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: false,
       extra: {
         charset: 'utf8mb4',
