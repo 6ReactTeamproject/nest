@@ -29,9 +29,7 @@
   align-items: center;
   opacity: 0;
   transition: opacity 0.3s ease;
-  pointer-events: auto;
-  z-index: 2;
-  cursor: pointer;
+  pointer-events: none;
 }
 
 .upload-img-wrapper:hover .edit-overlay {

@@ -1,10 +1,6 @@
 import { useState, useEffect } from "react";
 import "../../styles/chat.css";
 
-/**
- * 플로팅 채팅 버튼 컴포넌트
- * 화면 우측 하단에 고정된 채팅 버튼
- */
 const FloatingChatButton = ({ isOpen, onToggle, unreadCount = 0 }) => {
   const [isAnimating, setIsAnimating] = useState(false);
 

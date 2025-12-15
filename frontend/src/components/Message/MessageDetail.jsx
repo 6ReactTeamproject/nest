@@ -14,7 +14,6 @@ const MessageDetail = ({ message, onClose, onMessageSent }) => {
   const [replyData, setReplyData] = useState({ title: "", content: "" });
   const { success, error: showError } = useToast();
 
-  // isRead 값을 boolean으로 변환하는 헬퍼 함수
   const toBoolean = (value) => {
     if (value === true || value === 1 || value === "true" || value === "1") {
       return true;
@@ -35,16 +34,13 @@ const MessageDetail = ({ message, onClose, onMessageSent }) => {
     loadUsers();
   }, [message]);
 
-  // 메시지 상세보기가 열릴 때 읽음 처리
   useEffect(() => {
     const markAsRead = async () => {
-      // 받은 쪽지이고 아직 읽지 않은 경우에만 읽음 처리
       if (message.receiverId === user?.id && !toBoolean(message.isRead)) {
         try {
           console.log("MessageDetail에서 읽음 처리 시작:", message.id);
           const response = await apiPatch("messages", message.id, { isRead: true });
           console.log("MessageDetail 백엔드 응답:", response);
-          // 부모 컴포넌트에 읽음 상태 변경 알림
           if (onMessageSent) {
             onMessageSent();
           }
@@ -88,7 +84,6 @@ const MessageDetail = ({ message, onClose, onMessageSent }) => {
     }
   };
 
-  // 답장 폼 입력값 변경 처리
   const handleReplyChange = (e) => {
     const { name, value } = e.target;
     setReplyData((prev) => ({ ...prev, [name]: value }));
@@ -113,17 +108,14 @@ const MessageDetail = ({ message, onClose, onMessageSent }) => {
             </span>
           </div>
         </div>
-        {/* 상세보기 닫기 버튼 */}
         <button className="close-button" onClick={onClose}>
           ×
         </button>
       </div>
 
-      {/* 메시지 내용 */}
       <div className="message-detail-content">{message.content}</div>
 
       <div className="message-detail-footer">
-        {/* 받은 쪽지인 경우에만 답장 버튼 표시 */}
         {message.senderId !== user?.id && !showReplyForm && (
           <button
             className="reply-button"
@@ -134,7 +126,6 @@ const MessageDetail = ({ message, onClose, onMessageSent }) => {
         )}
       </div>
 
-      {/* 답장 */}
       {showReplyForm && (
         <div className="reply-form">
           <h3>답장 작성</h3>

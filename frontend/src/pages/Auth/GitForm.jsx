@@ -40,19 +40,16 @@ export default function GitForm() {
     }
   };
 
-  // 입력 필드 값 변경 시 실행되는 함수
   const handleChange = (e) => {
     const input = e.target.value;
     setGitInput(input);
 
-    // 깃허브 주소에서 ID 부분만 유효성 검사 (앞 주소 제거)
     const idPart = input.replace("https://github.com/", "");
     setIsValid(gitIdRegex.test(idPart));
   };
 
   return (
     <>
-      {/* 현재 저장된 깃허브 주소를 보여주는 영역 */}
       <p>
         깃허브 주소 :
         {user.giturl ? (
@@ -69,7 +66,6 @@ export default function GitForm() {
         )}
       </p>
 
-      {/* 입력 필드 및 저장 버튼 영역 */}
       <div className="giturl-form" style={{ marginTop: "10px" }}>
         <input
           type="text"
