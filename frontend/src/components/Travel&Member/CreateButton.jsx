@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiPost } from "../../api/fetch";
 import { useToast } from "../common/Toast";
 import FormButton from "../common/FormButton";
-import { MESSAGES, API_BASE_URL } from "../../constants";
+import { MESSAGES } from "../../constants";
 import "../../styles/form.css";
 
 export default function CreateButton({
@@ -70,14 +70,7 @@ export default function CreateButton({
     <div className="form-container">
       {enhancedChildren}
 
-      {/* 이미지 URL이 있을 경우 미리보기 표시 */}
-      {inputs.imageUrl && (
-        <img
-          src={inputs.imageUrl.startsWith('http') ? inputs.imageUrl : `${API_BASE_URL}${inputs.imageUrl}`}
-          alt="미리보기"
-          style={{ maxWidth: "100%", marginTop: "10px" }}
-        />
-      )}
+      {/* 이미지 미리보기는 PostImgUploader나 SelectImage 컴포넌트에서 자체적으로 표시하므로 여기서는 제거 */}
 
       <div className="button-group">
         <FormButton onClick={handleSubmit} className="add-button">
