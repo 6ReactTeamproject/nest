@@ -30,14 +30,12 @@ const Board = () => {
   const sortType = searchParams.get("sort") || "";
   const nav = useNavigate();
 
-  // 페이지 이동
   const setCurrentPage = (page) => {
     const newSearchParams = new URLSearchParams(searchParams);
     newSearchParams.set("page", page.toString());
     setSearchParams(newSearchParams);
   };
 
-  // 정렬
   const setSortType = (type) => {
     const newSearchParams = new URLSearchParams(searchParams);
     newSearchParams.set("sort", type);
@@ -45,7 +43,6 @@ const Board = () => {
     setSearchParams(newSearchParams);
   };
 
-  // 데이터 불러오기 (async/await로 변경, reverse 제거)
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -56,7 +53,6 @@ const Board = () => {
           apiGet("user/info"),
         ]);
 
-        // reverse() 제거 - 백엔드에서 이미 DESC로 정렬됨
         const postsData = postsRes.data ?? postsRes;
         setPosts(Array.isArray(postsData) ? postsData : []);
         setMembers(membersRes.data ?? membersRes);
@@ -71,7 +67,6 @@ const Board = () => {
     loadData();
   }, []);
 
-  // 검색어 변경
   const handleTermChange = (term) => {
     setSearchTerm(term);
     if (!term.trim()) {
@@ -80,7 +75,6 @@ const Board = () => {
     }
   };
 
-  // 검색 실행
   const handleSearch = () => {
     if (!searchTerm.trim()) {
       setIsSearching(false);
@@ -99,7 +93,6 @@ const Board = () => {
     setCurrentPage(1);
   };
 
-  // 정렬된 데이터
   const source = isSearching ? filtered : posts;
   const sortedPosts = [...source].sort((a, b) => {
     if (sortType === "views") return b.views - a.views;
@@ -118,7 +111,6 @@ const Board = () => {
     <div className="board-container">
       <h2 className="board-title">게시판</h2>
 
-      {/* 상단 버튼 */}
       <div className="board-actions">
         <div className="board-sort-buttons">
           <button
@@ -151,7 +143,6 @@ const Board = () => {
         </button>
       </div>
 
-      {/* 게시글 목록 */}
       <PostList
         users={users}
         posts={currentPosts}
@@ -162,7 +153,6 @@ const Board = () => {
         }}
       />
 
-      {/* 페이지네이션 */}
       {displayPosts.length > 0 && (
         <Pagination
           currentPage={currentPage}
@@ -172,7 +162,6 @@ const Board = () => {
         />
       )}
 
-      {/* 검색 */}
       <SearchBar
         searchTerm={searchTerm}
         searchType={searchType}

@@ -32,7 +32,6 @@ function PostActions({ post, currentUser, id }) {
     }
   };
 
-  // 게시글 수정 페이지로 이동
   const handleEdit = () => {
     navigate(`/post/edit/${id}`, {
       state: {
@@ -43,14 +42,10 @@ function PostActions({ post, currentUser, id }) {
     });
   };
 
-  // 작성자만 수정/삭제 버튼 표시
   const isAuthor = currentUser && post && compareIds(currentUser.id, post.userId);
 
   return (
     <div className="post-actions-container">
-      {/* 작성자 정보 표시 */}
-
-      {/* 작성자인 경우에만 수정/삭제 버튼 표시 */}
       {isAuthor && (
         <>
           <button className="edit-button" onClick={handleEdit}>
