@@ -1,3 +1,5 @@
+
+
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -12,8 +14,9 @@ import { User } from './user.entity';
 import { ChatRoom } from './chat-room.entity';
 
 @Entity({ name: 'chat_room_participants' })
-@Unique(['roomId', 'userId']) // 같은 사용자가 같은 방에 중복 참여 불가
+@Unique(['roomId', 'userId']) 
 export class ChatRoomParticipant {
+  
   @PrimaryGeneratedColumn()
   id: number;
 

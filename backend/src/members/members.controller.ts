@@ -1,3 +1,5 @@
+
+
 import {
   Controller,
   Get,
@@ -49,6 +51,7 @@ export class MembersController {
     @Body() createMemberDto: CreateMemberDto,
     @GetUser() user: { userId: number; loginId: string },
   ): Promise<Member> {
+
     return this.membersService.create({
       ...createMemberDto,
       userId: user.userId,

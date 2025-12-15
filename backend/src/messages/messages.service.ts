@@ -1,3 +1,5 @@
+
+
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -6,6 +8,7 @@ import { Message } from 'src/user/entities/messages.entity';
 @Injectable()
 export class MessageService {
   constructor(
+    
     @InjectRepository(Message)
     private readonly messageRepository: Repository<Message>,
   ) {}
@@ -15,7 +18,9 @@ export class MessageService {
   }
 
   async create(data: Partial<Message>): Promise<Message> {
+    
     const message = this.messageRepository.create(data);
+    
     return await this.messageRepository.save(message);
   }
 
@@ -28,10 +33,12 @@ export class MessageService {
     if (!message) {
       throw new NotFoundException('Message not found');
     }
+
     if (message.senderId !== userId && message.receiverId !== userId) {
       throw new ForbiddenException('본인의 메시지만 수정할 수 있습니다.');
     }
     await this.messageRepository.update(id, data);
+    
     return this.getOne(id);
   }
 

@@ -1,3 +1,5 @@
+
+
 import {
   Controller,
   Get,
@@ -34,6 +36,7 @@ export class MessageController {
     @Body() createMessageDto: CreateMessageDto,
     @GetUser() user: { userId: number; loginId: string },
   ): Promise<Message> {
+
     return await this.messageService.create({
       ...createMessageDto,
       senderId: user.userId,

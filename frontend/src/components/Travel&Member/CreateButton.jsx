@@ -3,15 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { apiPost } from "../../api/fetch";
 import { useToast } from "../common/Toast";
 import FormButton from "../common/FormButton";
-import { MESSAGES, API_BASE_URL } from "../../constants";
+import { MESSAGES } from "../../constants";
 import "../../styles/form.css";
 
-export default function CreateButton({
-  endpoint,
-  redirect,
-  empty,
-  children,
-}) {
+export default function CreateButton({ endpoint, redirect, empty, children }) {
   const navigate = useNavigate();
   const [inputs, setInputs] = useState({});
   const { success, error: showError } = useToast();
@@ -24,19 +19,19 @@ export default function CreateButton({
 
     try {
       const allowedFields = {
-        'members': ['name', 'introduction', 'imageUrl'],
-        'semester': ['title', 'description', 'imageUrl'],
+        members: ["name", "introduction", "imageUrl"],
+        semester: ["title", "description", "imageUrl"],
       };
-      
+
       const fields = allowedFields[endpoint] || Object.keys(inputs);
       const submitData = {};
-      
-      fields.forEach(field => {
+
+      fields.forEach((field) => {
         if (inputs.hasOwnProperty(field)) {
           submitData[field] = inputs[field];
         }
       });
-      
+
       await apiPost(endpoint, submitData);
       success(MESSAGES.CREATE_SUCCESS);
       navigate(redirect);
@@ -61,14 +56,6 @@ export default function CreateButton({
   return (
     <div className="form-container">
       {enhancedChildren}
-
-      {inputs.imageUrl && (
-        <img
-          src={inputs.imageUrl.startsWith('http') ? inputs.imageUrl : `${API_BASE_URL}${inputs.imageUrl}`}
-          alt="미리보기"
-          style={{ maxWidth: "100%", marginTop: "10px" }}
-        />
-      )}
 
       <div className="button-group">
         <FormButton onClick={handleSubmit} className="add-button">

@@ -1,3 +1,5 @@
+
+
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -11,6 +13,7 @@ import { User } from './user.entity';
 
 @Entity({ name: 'refresh_tokens' })
 export class RefreshToken {
+  
   @PrimaryGeneratedColumn()
   id: number;
 

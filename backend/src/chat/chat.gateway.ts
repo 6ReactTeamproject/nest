@@ -1,3 +1,5 @@
+
+
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -20,13 +22,13 @@ import { User } from '../user/entities/user.entity';
 
 @WebSocketGateway({
   cors: {
-    origin: 'http://localhost:5173',
+    origin: 'http://localhost:5173', 
     credentials: true,
   },
-  namespace: '/chat',
-  transports: ['websocket', 'polling'],
+  namespace: '/chat', 
+  transports: ['websocket', 'polling'], 
 })
-@UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+@UsePipes(new ValidationPipe({ transform: true, whitelist: true })) 
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
@@ -45,6 +47,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.logger.log(`Client connected: ${client.id}`);
 
     try {
+      
       const token =
         client.handshake.auth?.token ||
         client.handshake.headers.authorization?.replace('Bearer ', '');
@@ -86,6 +89,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         `Token verification failed for client ${client.id}:`,
         error.message,
       );
+      
       this.chatService.addUser(client.id, {
         userId: 0,
         username: '익명',
@@ -97,16 +101,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.logger.log(`Client disconnected: ${client.id}`);
     const user = this.chatService.getUser(client.id);
     if (user) {
+      
       const rooms = Array.from(client.rooms);
       rooms.forEach((room) => {
         if (room !== client.id) {
+          
           const isPublicRoom = ['general', 'travel', 'food'].includes(room);
           if (!isPublicRoom) {
             const systemMessage = {
               ...this.chatService.createSystemMessage(
                 `${user.username} 님이 나갔습니다.`,
               ),
-              roomId: room,
+              roomId: room, 
             };
             client.to(room).emit('systemMessage', systemMessage);
           }
@@ -136,6 +142,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       );
 
       if (existingMessages.length > 0) {
+        
         const messagesPayload = await Promise.all(
           existingMessages.map(async (msg) => {
             const user = await this.userRepository.findOne({
@@ -143,7 +150,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
               select: ['id', 'name'],
             });
             return {
-              id: msg.id,
+              id: msg.id, 
               roomId: msg.roomId,
               userId: msg.userId,
               username: user?.name || '익명',
@@ -162,7 +169,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           ...this.chatService.createSystemMessage(
             `${username} 님이 입장했습니다.`,
           ),
-          roomId: data.roomId,
+          roomId: data.roomId, 
         };
         client.to(data.roomId).emit('systemMessage', systemMessage);
       }
@@ -196,8 +203,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           ...this.chatService.createSystemMessage(
             `${username} 님이 나갔습니다.`,
           ),
-          roomId: data.roomId,
+          roomId: data.roomId, 
         };
+        
         client.to(data.roomId).emit('systemMessage', systemMessage);
       }
 
@@ -239,9 +247,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       const messagePayload = {
         ...payload,
-        id: savedMessage.id,
+        id: savedMessage.id, 
         userId: userId,
-        roomId: data.roomId,
+        roomId: data.roomId, 
       };
 
       this.server.to(data.roomId).emit('chatMessage', messagePayload);

@@ -11,10 +11,10 @@ import { UserModule } from '../user/user.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, ChatMessage, ChatRoom]),
-    JwtModule.register({}),
-    UserModule,
+    JwtModule.register({}), 
+    UserModule, 
   ],
   providers: [ChatGateway, ChatService],
-  exports: [ChatService],
+  exports: [ChatService], 
 })
 export class ChatModule {}

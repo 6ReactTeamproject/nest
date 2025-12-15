@@ -1,3 +1,5 @@
+
+
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -36,6 +38,7 @@ export class ChatService {
     success: boolean;
     message: string;
   } {
+    
     if (!roomId || roomId.trim().length === 0) {
       throw new BadRequestException('방 ID를 입력해주세요.');
     }
@@ -54,6 +57,7 @@ export class ChatService {
     success: boolean;
     message: string;
   } {
+    
     if (!roomId || roomId.trim().length === 0) {
       throw new BadRequestException('방 ID를 입력해주세요.');
     }
@@ -72,6 +76,7 @@ export class ChatService {
     message: string;
     time: string;
   } {
+    
     if (!data.message || data.message.trim().length === 0) {
       throw new BadRequestException('메시지를 입력해주세요.');
     }
@@ -107,10 +112,12 @@ export class ChatService {
     });
 
     if (!room) {
-      const isPrivateRoom = roomId.startsWith('private-');
       
+      const isPrivateRoom = roomId.startsWith('private-');
+
       let roomName = roomId;
       if (isPrivateRoom) {
+        
         roomName = '1:1 채팅';
       }
 
@@ -131,8 +138,9 @@ export class ChatService {
     userId: number,
     message: string,
   ): Promise<ChatMessage> {
-    const room = await this.getOrCreateRoom(roomId, userId);
     
+    const room = await this.getOrCreateRoom(roomId, userId);
+
     if (!room) {
       throw new BadRequestException(`방 생성에 실패했습니다: ${roomId}`);
     }

@@ -1,3 +1,5 @@
+
+
 import {
   Entity,
   PrimaryColumn,
@@ -15,6 +17,7 @@ import { ChatRoomParticipant } from './chat-room-participant.entity';
 
 @Entity({ name: 'chat_rooms' })
 export class ChatRoom {
+
   @PrimaryColumn({ length: 50 })
   roomId: string;
 

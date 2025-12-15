@@ -1,3 +1,5 @@
+
+
 import {
   IsString,
   IsNotEmpty,
@@ -9,8 +11,10 @@ import {
 } from 'class-validator';
 
 export class CreateMessageDto {
+
   @IsNumber({}, { message: '수신자 ID는 숫자여야 합니다.' })
   @IsInt({ message: '수신자 ID는 정수여야 합니다.' })
+
   @Min(1, { message: '수신자 ID는 1 이상이어야 합니다.' })
   receiverId: number;
 

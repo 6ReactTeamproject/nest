@@ -1,3 +1,5 @@
+
+
 import {
   Controller,
   Get,
@@ -15,8 +17,10 @@ import { GetUser } from '../auth/decorators/get-user.decorator';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @ApiTags('사용자')
+
 @Controller('user')
 export class UserController {
+  
   constructor(private readonly userService: UserService) {}
 
   @Get('all')
@@ -34,16 +38,17 @@ export class UserController {
   }
 
   @ApiOperation({ summary: '사용자 정보 수정' })
-  @ApiBearerAuth('JWT-auth')
+  @ApiBearerAuth('JWT-auth') 
   @ApiResponse({ status: 200, description: '사용자 정보 수정 성공' })
   @ApiResponse({ status: 403, description: '본인의 정보만 수정 가능' })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard) 
   @Patch(':id')
   async update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
     @GetUser() user: { userId: number; loginId: string },
   ) {
+
     const userId = Number(id);
     if (user.userId !== userId) {
       throw new ForbiddenException('본인의 정보만 수정할 수 있습니다.');

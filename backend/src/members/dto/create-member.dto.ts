@@ -1,3 +1,5 @@
+
+
 import {
   IsString,
   IsNotEmpty,
@@ -8,6 +10,7 @@ import {
 } from 'class-validator';
 
 export class CreateMemberDto {
+
   @IsString({ message: '이름은 문자열이어야 합니다.' })
   @IsNotEmpty({ message: '이름을 입력해주세요.' })
   @MinLength(1, { message: '이름은 최소 1자 이상이어야 합니다.' })

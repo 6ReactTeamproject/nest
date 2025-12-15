@@ -1,3 +1,5 @@
+
+
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -13,6 +15,7 @@ import { Comment } from './comments.entity';
 
 @Entity({ name: 'posts' })
 export class Post {
+  
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -24,6 +27,7 @@ export class Post {
 
   @ManyToOne(() => User, (user) => user.posts, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
+  
   @Index()
   user: User;
 

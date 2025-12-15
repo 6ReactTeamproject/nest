@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../../hooks/UserContext";
 import { useNavigate, useLocation } from "react-router-dom";
+import { API_BASE_URL } from "../../constants";
 import "../../styles/travel.css";
 import "../../styles/header.css";
 
@@ -16,14 +17,26 @@ export function UserSection() {
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
-      setPreview(parsedUser.image || "");
+      if (parsedUser.image) {
+        const fullImageUrl = parsedUser.image.startsWith("http")
+          ? parsedUser.image
+          : `${API_BASE_URL}${parsedUser.image}`;
+        setPreview(fullImageUrl);
+      } else {
+        setPreview("");
+      }
     }
     setIsLoading(false);
   }, [setUser]);
 
   useEffect(() => {
     if (user?.image) {
-      setPreview(user.image);
+      const fullImageUrl = user.image.startsWith("http")
+        ? user.image
+        : `${API_BASE_URL}${user.image}`;
+      setPreview(fullImageUrl);
+    } else {
+      setPreview("");
     }
   }, [user?.image]);
 

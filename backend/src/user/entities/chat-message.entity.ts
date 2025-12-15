@@ -1,3 +1,5 @@
+
+
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -12,6 +14,7 @@ import { ChatRoom } from './chat-room.entity';
 
 @Entity({ name: 'chat_messages' })
 export class ChatMessage {
+  
   @PrimaryGeneratedColumn()
   id: number;
 

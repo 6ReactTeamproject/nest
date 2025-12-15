@@ -1,3 +1,5 @@
+
+
 import {
   Controller,
   Get,
@@ -24,9 +26,11 @@ export class PostsController {
 
   @Get('all')
   async getAll(@Query('userId') userId?: number): Promise<PostEntity[]> {
+
     if (userId) {
       return await this.postsService.getByUserId(Number(userId));
     }
+    
     return await this.postsService.getAll();
   }
 
@@ -62,6 +66,7 @@ export class PostsController {
     @Body() createPostDto: CreatePostDto,
     @GetUser() user: { userId: number; loginId: string },
   ): Promise<PostEntity> {
+
     return await this.postsService.create({ ...createPostDto, userId: user.userId });
   }
 

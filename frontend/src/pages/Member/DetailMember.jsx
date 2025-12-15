@@ -64,11 +64,15 @@ function DetailMember() {
           />
         ) : (
           <>
-            {members.imageUrl && (
+            {members.imageUrl && members.imageUrl !== null && members.imageUrl !== '' && (
               <img  
                 src={members.imageUrl.startsWith('http') ? members.imageUrl : `${API_BASE_URL}${members.imageUrl}`}
                 alt="preview"
                 style={{ maxWidth: "340px", borderRadius: "8px" }}
+                onError={(e) => {
+                  console.error("이미지 로드 실패:", e.target.src);
+                  e.target.style.display = 'none';
+                }}
               />
             )}
             <br />

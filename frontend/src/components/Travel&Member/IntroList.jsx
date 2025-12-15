@@ -24,7 +24,9 @@ export default function IntroList({
     apiGet(endpoint)
       .then((res) => {
         const items = res.data ?? res;
-        setItems(Array.isArray(items) ? items : []);
+        const itemsArray = Array.isArray(items) ? items : [];
+        console.log("조원 소개 데이터:", itemsArray);
+        setItems(itemsArray);
       })
       .catch((err) => console.error("데이터 불러오기 실패:", err));
   }, [endpoint]);
@@ -47,7 +49,7 @@ export default function IntroList({
           >
             <img
               src={
-                item[imageKey]
+                item[imageKey] && item[imageKey] !== null && item[imageKey] !== ''
                   ? item[imageKey].startsWith('http')
                     ? item[imageKey]
                     : `${API_BASE_URL}${item[imageKey]}`

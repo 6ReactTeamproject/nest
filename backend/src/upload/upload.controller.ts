@@ -42,7 +42,7 @@ export class UploadController {
     
     return {
       success: true,
-      path: filePath, // 예: /uploads/uuid-filename.jpg
+      path: filePath,
       message: '파일이 성공적으로 업로드되었습니다.',
     };
   }

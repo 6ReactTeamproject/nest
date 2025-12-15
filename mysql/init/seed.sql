@@ -196,10 +196,10 @@ INSERT IGNORE INTO messages (id, senderId, receiverId, title, content, createdAt
 
 -- Members
 INSERT IGNORE INTO members (id, user_id, name, introduction, imageUrl) VALUES
-(1, 1, '강희준', '안녕하세요, 강희준입니다.', NULL),
-(2, 2, '김성민', '안녕하세요, 김성민입니다.', NULL),
-(3, 3, '권혁빈', '안녕하세요, 권혁빈입니다.', NULL),
-(4, 4, '이창민', '안녕하세요, 이창민입니다.', NULL);
+(1, 1, '강희준', '안녕하세요, 강희준입니다.', 'https://plus.unsplash.com/premium_photo-1683133319664-d77396ed81aa?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
+(2, 2, '김성민', '안녕하세요, 김성민입니다.', 'https://images.unsplash.com/photo-1737729991003-521d47240eb3?q=80&w=2062&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
+(3, 3, '권혁빈', '안녕하세요, 권혁빈입니다.', 'https://images.unsplash.com/photo-1752856408620-2e6fc6ac072f?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
+(4, 4, '이창민', '안녕하세요, 이창민입니다.', 'https://images.unsplash.com/photo-1737573477556-ac3ed2db618c?q=80&w=627&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
 
 -- Chat rooms (예시 채팅방)
 INSERT IGNORE INTO chat_rooms (roomId, name, description, createdBy, createdAt) VALUES

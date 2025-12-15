@@ -1,3 +1,5 @@
+
+
 import {
   Controller,
   Post,
@@ -12,8 +14,10 @@ import { RegisterDto } from './dto/register.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @ApiTags('인증')
+
 @Controller('auth')
 export class AuthController {
+
   constructor(private authService: AuthService) {}
 
   @ApiOperation({ summary: '회원가입' })
@@ -21,6 +25,7 @@ export class AuthController {
   @ApiResponse({ status: 409, description: '이미 존재하는 아이디' })
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
+
     return await this.authService.register(registerDto);
   }
 

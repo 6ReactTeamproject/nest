@@ -1,3 +1,5 @@
+
+
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -11,11 +13,13 @@ import { User } from './user.entity';
 
 @Entity({ name: 'semester' })
 export class Semester {
+  
   @PrimaryGeneratedColumn()
   id: number;
 
   @ManyToOne(() => User, (user) => user.semesters, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'authorId' })
+  
   @Index()
   author: User;
 

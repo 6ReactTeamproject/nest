@@ -1,3 +1,5 @@
+
+
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -11,11 +13,13 @@ import { User } from './user.entity';
 
 @Entity({ name: 'messages' })
 export class Message {
+  
   @PrimaryGeneratedColumn()
   id: number;
 
   @ManyToOne(() => User, (user) => user.sentMessages, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'senderId' })
+  
   @Index()
   sender: User;
 
