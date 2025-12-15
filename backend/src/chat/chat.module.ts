@@ -11,10 +11,10 @@ import { UserModule } from '../user/user.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, ChatMessage, ChatRoom]),
-    JwtModule.register({}), // JWT 토큰 검증을 위해
-    UserModule, // UserService 사용을 위해
+    JwtModule.register({}),
+    UserModule,
   ],
   providers: [ChatGateway, ChatService],
-  exports: [ChatService], // 다른 모듈에서도 사용할 수 있도록 export
+  exports: [ChatService],
 })
 export class ChatModule {}
